@@ -1,0 +1,58 @@
+---
+title: "Project 4 Proposal"
+format: pdf
+editor: visual
+author: Amia Graye, Julia Martin, Rosie Quint
+---
+
+dashboard plus chatbot and prompt
+
+Rough ideas 
+Use CDC api to get data on U.S. Chronic Disease Indicators (CDI), 2023 Release
+Build a database 
+Some sort of predictive element
+
+The title of your project and the team members names
+
+You should describe a research or data analysis question and explain its importance
+
+You should summarize work that already exists (if it does)
+
+You should outline the work you plan to do
+
+You should demonstrate you have access to the data, describe the data, and propose how you will collect the data
+
+You should describe the programming paradigms you plan to use and why it makes sense to combine them for your project
+
+You should describe any packages and/or software you plan to use
+
+You should briefly describe the data analytic product you plan to build
+
+You should describe a tentative timeline for the proposal
+
+You should describe how the tasks will be split amongst the team members
+
+
+
+
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
