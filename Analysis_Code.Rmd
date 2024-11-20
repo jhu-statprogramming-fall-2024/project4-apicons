@@ -8,3 +8,7 @@ To Do:
 
 Extract data from API 
 Categorize the neighborhoods by the criteria
+
+Julia: grocery store distance
+Amia: vehicles
+Rosie: income
