@@ -12,3 +12,18 @@ Categorize the neighborhoods by the criteria
 Julia: grocery store distance
 Amia: vehicles
 Rosie: income
+
+Income
+
+```{r}
+income_url <- "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Mhhi/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson"
+
+library(jsonlite)
+library(tidyverse)
+jsonData <- read_json(income_url, simplifyVector = TRUE)
+glimpse(jsonData)
+jsonData
+
+jsonData$features$properties
+```
+
