@@ -13,17 +13,46 @@ Julia: grocery store distance
 Amia: vehicles
 Rosie: income
 
-Income
+### Extract Data from API:  
+
+HFAI  
 
 ```{r}
-income_url <- "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Mhhi/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson"
+hfai_url <- "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hfai/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
 
-library(jsonlite)
-library(tidyverse)
-jsonData <- read_json(income_url, simplifyVector = TRUE)
-glimpse(jsonData)
-jsonData
+jsonData <- read_json(hfai_url, simplifyVector = TRUE)
 
-jsonData$features$properties
+hfai <- jsonData$features$attributes %>% 
+  select(OBJECTID, CSA2010, hfai15, Shape__Area, Shape__Length)
+head(hfai)
 ```
 
+
+Median Income
+
+```{r}
+library(jsonlite)
+library(tidyverse)
+
+income_url <- "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Mhhi/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson"
+
+jsonData <- read_json(income_url, simplifyVector = TRUE)
+
+med_income <- jsonData$features$properties %>% 
+  select(OBJECTID, CSA2010, mhhi22, Shape__Area, Shape__Length)
+head(med_income)
+```
+
+Percent of Vehicles Available
+
+```{r}
+vehicles_url <- "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Novhcl/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
+
+jsonData <- read_json(vehicles_url, simplifyVector = TRUE)
+
+vehicles <- jsonData$features$attributes %>% 
+  select(OBJECTID, CSA2010, novhcl22, Shape__Area, Shape__Length)
+head(med_income)
+```
+
+Grocery Store Location
