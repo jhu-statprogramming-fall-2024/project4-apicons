@@ -56,3 +56,30 @@ head(med_income)
 ```
 
 Grocery Store Location
+
+```{r}
+grocery_store_url <- "https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Grocery_Store/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
+
+jsonData <- read_json(grocery_store_url, simplifyVector = TRUE)
+
+grocery_stores <- jsonData$features$attributes #%>% 
+  select(OBJECTID, CSA2010, novhcl22, Shape__Area, Shape__Length)
+head(med_income)
+```
+Check if all CSA boundaries match
+
+
+```{r}
+# install.packages("pak")
+library(pak)
+#pak::pkg_install("elipousson/mapbaltimore", dependencies = TRUE)
+library(mapbaltimore)
+
+length(get_area(
+  type = "csa",
+  location = grocery_stores$address
+)$name)
+
+mapbaltimore::csas$name
+```
+
