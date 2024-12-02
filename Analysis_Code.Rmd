@@ -29,6 +29,7 @@ head(hfai)
 
 
 Median Income
+Notes - use threshold of federal poverty level for a family of 4 ($31,200 in 2024). classify neighbourhoods as 1 where median income is 185% of this or less (in this case $57,720)
 
 ```{r}
 library(jsonlite)
@@ -40,6 +41,10 @@ jsonData <- read_json(income_url, simplifyVector = TRUE)
 
 med_income <- jsonData$features$properties %>% 
   select(OBJECTID, CSA2010, mhhi22, Shape__Area, Shape__Length)
+
+income_criteria <- med_income %>%
+  income_criteria$income_boolean <- ifelse(med_income$mhhi22 < 57720)
+
 head(med_income)
 ```
 
@@ -62,7 +67,7 @@ grocery_store_url <- "https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/
 
 jsonData <- read_json(grocery_store_url, simplifyVector = TRUE)
 
-grocery_stores <- jsonData$features$attributes #%>% 
+grocery_stores <- jsonData$features$attributes %>% 
   select(OBJECTID, CSA2010, novhcl22, Shape__Area, Shape__Length)
 head(med_income)
 ```
