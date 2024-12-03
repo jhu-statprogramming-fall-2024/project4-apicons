@@ -42,10 +42,9 @@ jsonData <- read_json(income_url, simplifyVector = TRUE)
 med_income <- jsonData$features$properties %>% 
   select(OBJECTID, CSA2010, mhhi22, Shape__Area, Shape__Length)
 
-income_criteria <- med_income %>%
-  income_criteria$income_boolean <- ifelse(med_income$mhhi22 < 57720)
-
-head(med_income)
+income_table_for_joining <- med_income %>%
+  mutate(income_boolean = ifelse(mhhi22 < 57720, 1, 0)) %>%
+  select(CSA2010, income_boolean)
 ```
 
 Percent of Vehicles Available
@@ -55,9 +54,11 @@ vehicles_url <- "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/servi
 
 jsonData <- read_json(vehicles_url, simplifyVector = TRUE)
 
-vehicles <- jsonData$features$attributes %>% 
-  select(OBJECTID, CSA2010, novhcl22, Shape__Area, Shape__Length)
-head(vehicles)
+vehicle_table_for_joining <- vehicles %>%
+  mutate(vehicle_boolean = ifelse(novhcl22 > 30, 1, 0)) %>%
+  select(CSA2010, vehicle_boolean)
+head(vehicle_table_for_joining)
+
 ```
 
 Grocery Store Location
@@ -117,6 +118,18 @@ vehicles_30 <- vehicles %>%
   filter(novhcl22 > 30)
 ```
 
+### Joining income, vehicle and grocery store data
+```{r}
+grocery_table_for_joining <- grocery_stores_csa %>%
+  mutate(groc_store = as.numeric(groc_store))
+neighbourhood_priority_levels <- income_table_for_joining %>%
+  left_join(vehicle_table_for_joining, by = 'CSA2010') %>%
+  left_join(grocery_table_for_joining, by = 'CSA2010') %>%
+  mutate(number_criteria_met = income_boolean + vehicle_boolean + groc_store, hfai_priority = case_when(number_criteria_met == 3 ~ 'High', number_criteria_met == 2 ~ 'Medium', number_criteria_met < 2 ~ 'Low'))
+
+neighbourhood_priority_levels
+
+``` 
 # Loading demographic data from API
 
 ## Age
@@ -358,6 +371,7 @@ vehicles_30_demo <- vehicles_30_children %>%
 head(vehicles_30_demo)
 summary(vehicles_30_demo)
 ```
+
 
 
 
