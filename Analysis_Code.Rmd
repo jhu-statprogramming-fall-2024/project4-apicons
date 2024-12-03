@@ -44,7 +44,7 @@ med_income <- jsonData$features$properties %>%
 
 income_table_for_joining <- med_income %>%
   mutate(income_boolean = ifelse(mhhi22 < 57720, 1, 0)) %>%
-  select(CSA2010, income_boolean)
+  select(CSA2010, income_boolean, median_income = mhhi22)
 ```
 
 Percent of Vehicles Available
@@ -54,9 +54,12 @@ vehicles_url <- "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/servi
 
 jsonData <- read_json(vehicles_url, simplifyVector = TRUE)
 
+vehicles <- jsonData$features$attributes %>%
+select(OBJECTID, CSA2010, novhcl22, Shape__Area, Shape__Length)
+
 vehicle_table_for_joining <- vehicles %>%
   mutate(vehicle_boolean = ifelse(novhcl22 > 30, 1, 0)) %>%
-  select(CSA2010, vehicle_boolean)
+  select(CSA2010, vehicle_boolean, percnt_no_vehicle = novhcl22)
 head(vehicle_table_for_joining)
 
 ```
@@ -98,7 +101,7 @@ contains_store <- function(n) {
   }
 }
 
-grocery_stores_csa <- data.frame(cbind(csas, map_dbl(.x = csas, .f = ~contains_store(.x))))
+grocery_stores_csa <- data.frame(cbind(csas, map_dbl(.x = csas, .f = ~contains_store(.x))), grocery_stores$storename[1:45], grocery_stores$address[1:45])
 colnames(grocery_stores_csa) <- c("CSA2010", "groc_store")
 head(grocery_stores_csa)
 
