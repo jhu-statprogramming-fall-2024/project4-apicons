@@ -87,4 +87,255 @@ length(get_area(
 
 mapbaltimore::csas$name
 ```
+### Which areas have over 30% of households without a vehicle available?
+
+```{r}
+library(dplyr)
+
+vehicles_30 <- vehicles %>% 
+  filter(novhcl22 > 30)
+```
+
+# Loading demographic data from API
+
+## Age
+
+### Percent of Population 5-17 years old
+
+```{r}
+library(jsonlite)
+library(tidyverse)
+
+pop_children_url <- "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Age18_/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
+
+jsonData <- read_json(pop_children_url, simplifyVector = TRUE)
+
+pop_children <- jsonData$features$attributes %>% 
+  select(OBJECTID, CSA2010, age18_22, Shape__Area, Shape__Length)
+
+head(pop_children)
+```
+
+### Percent of Population 18-24 years old
+
+```{r}
+library(jsonlite)
+library(tidyverse)
+
+pop_youngadult_url <- "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Age24_/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
+
+jsonData <- read_json(pop_youngadult_url, simplifyVector = TRUE)
+
+pop_youngadult <- jsonData$features$attributes %>% 
+  select(OBJECTID, CSA2010, age24_22, Shape__Area, Shape__Length)
+
+head(pop_youngadult)
+```
+
+### Percent of Population 24-64 years old
+
+```{r}
+library(jsonlite)
+library(tidyverse)
+
+pop_adult_url <- "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Age64_/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
+
+jsonData <- read_json(pop_adult_url, simplifyVector = TRUE)
+
+pop_adult <- jsonData$features$attributes %>% 
+  select(OBJECTID, CSA2010, age64_22, Shape__Area, Shape__Length)
+
+head(pop_adult)
+```
+
+### Percent of Population 65 and older
+
+```{r}
+library(jsonlite)
+library(tidyverse)
+
+pop_elderly_url <- "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Age65_/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
+
+jsonData <- read_json(pop_elderly_url, simplifyVector = TRUE)
+
+pop_elderly <- jsonData$features$attributes %>% 
+  select(OBJECTID, CSA2010, age65_22, Shape__Area, Shape__Length)
+
+head(pop_elderly)
+```
+
+## Race
+
+### Racial Diversity Index
+
+The percent chance that two people picked at random within an area will be of a different race/ethnicity. This number does not reflect which race/ethnicity is predominant within an area. The higher the value, the more racially and ethnically diverse an area.
+
+```{r}
+library(jsonlite)
+library(tidyverse)
+
+rdi_url <- "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Racdiv/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
+
+jsonData <- read_json(rdi_url, simplifyVector = TRUE)
+
+rdi <- jsonData$features$attributes %>% 
+  select(OBJECTID, CSA2010, racdiv22, Shape__Area, Shape__Length)
+
+head(rdi)
+```
+
+### Percent of Residents All Other Races
+
+The percentage of persons, out of the total number of persons living in an area, who self-identify as either American Indian, Alaskan Native, Native Hawaiian or Other Pacific Islander, or some other race (non-Hispanic).
+
+```{r}
+library(jsonlite)
+library(tidyverse)
+
+pop_other_url <- "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Ppac/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
+
+jsonData <- read_json(pop_other_url, simplifyVector = TRUE)
+
+pop_other <- jsonData$features$attributes %>% 
+  select(OBJECTID, CSA2010, ppac22, Shape__Area, Shape__Length)
+
+head(pop_other)
+```
+
+### Percent of Residents Black/African-American
+
+```{r}
+library(jsonlite)
+library(tidyverse)
+
+pop_black_url <- "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Paa/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
+
+jsonData <- read_json(pop_black_url, simplifyVector = TRUE)
+
+pop_black <- jsonData$features$attributes %>% 
+  select(OBJECTID, CSA2010, paa22, Shape__Area, Shape__Length)
+
+head(pop_black)
+```
+
+### Percent of Residents White (Caucasian)
+
+```{r}
+library(jsonlite)
+library(tidyverse)
+
+pop_white_url <- "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Pwhite/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
+
+jsonData <- read_json(pop_white_url, simplifyVector = TRUE)
+
+pop_white <- jsonData$features$attributes %>% 
+  select(OBJECTID, CSA2010, pwhite22, Shape__Area, Shape__Length)
+
+head(pop_white)
+```
+
+### Percent of Residents Hispanic
+
+```{r}
+library(jsonlite)
+library(tidyverse)
+
+pop_hispanic_url <- "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Phisp/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
+
+jsonData <- read_json(pop_hispanic_url, simplifyVector = TRUE)
+
+pop_hispanic <- jsonData$features$attributes %>% 
+  select(OBJECTID, CSA2010, phisp22, Shape__Area, Shape__Length)
+
+head(pop_hispanic)
+```
+
+### Percent of Resident Asian (Non-Hispanic)
+
+```{r}
+library(jsonlite)
+library(tidyverse)
+
+pop_asian_url <- "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Pasi/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
+
+jsonData <- read_json(pop_asian_url, simplifyVector = TRUE)
+
+pop_asian <- jsonData$features$attributes %>% 
+  select(OBJECTID, CSA2010, pasi22, Shape__Area, Shape__Length)
+
+head(pop_asian)
+```
+
+# Demographics for areas with over 30% of households without a vehicle
+
+```{r}
+library(dplyr)
+
+# filter demographic datasets
+## percent of population 5-17 years old
+vehicles_30_children <- pop_children %>% 
+  filter(CSA2010 %in% vehicles_30$CSA2010) %>%
+  select(CSA2010, age18_22)
+
+## percent of population 18-24 years old
+vehicles_30_youngadult <- pop_youngadult %>% 
+  filter(CSA2010 %in% vehicles_30$CSA2010) %>%
+  select(CSA2010, age24_22)
+
+## percent of population 24-64 years old
+vehicles_30_adult <- pop_adult %>% 
+  filter(CSA2010 %in% vehicles_30$CSA2010) %>%
+  select(CSA2010, age64_22)
+
+## percent of population 65 and older
+vehicles_30_elderly <- pop_elderly %>% 
+  filter(CSA2010 %in% vehicles_30$CSA2010) %>%
+  select(CSA2010, age65_22)
+
+## racial diversity index
+vehicles_30_rdi <- rdi %>% 
+  filter(CSA2010 %in% vehicles_30$CSA2010) %>%
+  select(CSA2010, racdiv22)
+
+## percent of residents all other races
+vehicles_30_other <- pop_other %>% 
+  filter(CSA2010 %in% vehicles_30$CSA2010) %>%
+  select(CSA2010, ppac22)
+
+## percent of residents black/african-american
+vehicles_30_black <- pop_black %>% 
+  filter(CSA2010 %in% vehicles_30$CSA2010) %>%
+  select(CSA2010, paa22)
+
+## percent of residents white
+vehicles_30_white <- pop_white %>% 
+  filter(CSA2010 %in% vehicles_30$CSA2010) %>%
+  select(CSA2010, pwhite22)
+
+## percent of residents hispanic
+vehicles_30_hispanic <- pop_hispanic %>% 
+  filter(CSA2010 %in% vehicles_30$CSA2010) %>%
+  select(CSA2010, phisp22)
+
+## percent of residents asian
+vehicles_30_asian <- pop_asian %>% 
+  filter(CSA2010 %in% vehicles_30$CSA2010) %>%
+  select(CSA2010, pasi22)
+
+# merge datasets
+vehicles_30_demo <- vehicles_30_children %>% 
+  full_join(vehicles_30_youngadult, by = "CSA2010") %>% 
+  full_join(vehicles_30_adult, by = "CSA2010") %>% 
+  full_join(vehicles_30_elderly, by = "CSA2010") %>% 
+  full_join(vehicles_30_rdi, by = "CSA2010") %>% 
+  full_join(vehicles_30_other, by = "CSA2010") %>% 
+  full_join(vehicles_30_black, by = "CSA2010") %>% 
+  full_join(vehicles_30_white, by = "CSA2010") %>% 
+  full_join(vehicles_30_hispanic, by = "CSA2010") %>% 
+  full_join(vehicles_30_asian, by = "CSA2010")
+
+head(vehicles_30_demo)
+summary(vehicles_30_demo)
+```
+
 
