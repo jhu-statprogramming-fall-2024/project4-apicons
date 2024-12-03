@@ -57,34 +57,58 @@ jsonData <- read_json(vehicles_url, simplifyVector = TRUE)
 
 vehicles <- jsonData$features$attributes %>% 
   select(OBJECTID, CSA2010, novhcl22, Shape__Area, Shape__Length)
-head(med_income)
+head(vehicles)
 ```
 
 Grocery Store Location
 
 ```{r}
+# install.packages("pak")
+library(pak)
+library(purrr)
+#pak::pkg_install("elipousson/mapbaltimore", dependencies = TRUE)
+library(mapbaltimore)
 grocery_store_url <- "https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Grocery_Store/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
 
 jsonData <- read_json(grocery_store_url, simplifyVector = TRUE)
 
-grocery_stores <- jsonData$features$attributes %>% 
-  select(OBJECTID, CSA2010, novhcl22, Shape__Area, Shape__Length)
-head(med_income)
+grocery_stores <- jsonData$features$attributes
+
+# remove store in row 46 because it is outside of the zone and doesn't register as an address
+
+add <- grocery_stores$address[1:45]
+
+csas_with_store <- map(.x = add, .f = ~ get_area(type="csa", location = .x)$name)
+
+# assign manually stores which did not get assigned a CSA
+
+csas_with_store[[19]] <- "South Baltimore"
+csas_with_store[[38]] <- "South Baltimore" 
+
+# create vector with CSA names
+
+csas <- vehicles$CSA2010
+
+contains_store <- function(n) {
+  if(n %in% csas_with_store) {
+    1
+  } else {
+    0
+  }
+}
+
+grocery_stores_csa <- data.frame(cbind(csas, map_dbl(.x = csas, .f = ~contains_store(.x))))
+colnames(grocery_stores_csa) <- c("CSA2010", "groc_store")
+head(grocery_stores_csa)
+
+#data.frame(cbind(mapbaltimore::csas$name, vehicles$CSA2010))
+#vehicles$CSA2010 %in% mapbaltimore::csas$name
+#length(mapbaltimore::csas$name)
+#length(vehicles$CSA2010)
+#mapbaltimore::csas$name %in% vehicles$CSA2010
+#mapbaltimore::csas$name[51]
 ```
-Check if all CSA boundaries match
 
 
-```{r}
-# install.packages("pak")
-library(pak)
-#pak::pkg_install("elipousson/mapbaltimore", dependencies = TRUE)
-library(mapbaltimore)
 
-length(get_area(
-  type = "csa",
-  location = grocery_stores$address
-)$name)
-
-mapbaltimore::csas$name
-```
 
