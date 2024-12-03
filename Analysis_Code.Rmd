@@ -372,6 +372,18 @@ head(vehicles_30_demo)
 summary(vehicles_30_demo)
 ```
 
+# Building dashboards with flexdashboard
+
+## Install and load packages
+
+```{r}
+#install.packages(c("flexdashboard", "DT", "shiny"))
+library(flexdashboard)
+library(DT)
+library(shiny)
+```
+
+
 
 
 
