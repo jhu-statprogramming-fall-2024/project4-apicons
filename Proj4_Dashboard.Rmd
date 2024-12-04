@@ -1,5 +1,5 @@
 ---
-title: "Project 4 Dashboard"
+title: "Food Accessibility in Baltimore by Neighborhood"
 author: "Amia Graye, Rosie Quint, and Julia Martin"
 output: 
   flexdashboard::flex_dashboard:
@@ -8,7 +8,6 @@ output:
     source_code: embed
     vertical_layout: fill
 runtime: shiny
-date: "2024-12-03"
 ---
 
 ```{r global, include=FALSE}
@@ -27,3 +26,16 @@ library(jsonlite)
 library(mapbaltimore)
 ```
 
+# Welcome and Introduction
+
+
+# Categorization of Baltimore Neighborhoods
+
+
+# Find Your Nearest Grocery Store
+
+
+# Demographic Characteristics of Baltimore Neighborhoods
+
+
+# Comparison to Prior Study Prior to Pandemic
