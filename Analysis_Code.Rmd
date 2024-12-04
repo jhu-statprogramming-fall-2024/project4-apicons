@@ -18,6 +18,9 @@ Rosie: income
 HFAI  
 
 ```{r}
+library(jsonlite)
+library(tidyverse)
+
 hfai_url <- "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hfai/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
 
 jsonData <- read_json(hfai_url, simplifyVector = TRUE)
@@ -50,6 +53,9 @@ income_table_for_joining <- med_income %>%
 Percent of Vehicles Available
 
 ```{r}
+library(jsonlite)
+library(tidyverse)
+
 vehicles_url <- "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Novhcl/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
 
 jsonData <- read_json(vehicles_url, simplifyVector = TRUE)
@@ -67,6 +73,9 @@ head(vehicle_table_for_joining)
 Grocery Store Location
 
 ```{r}
+library(jsonlite)
+library(tidyverse)
+
 # install.packages("pak")
 library(pak)
 library(purrr)
