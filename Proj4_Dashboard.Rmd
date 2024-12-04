@@ -3,40 +3,14 @@ title: "Food Accessibility in Baltimore by Neighborhood"
 author: "Amia Graye, Rosie Quint, and Julia Martin"
 output: 
   flexdashboard::flex_dashboard: 
-    orientation: columns
     social: menu
     source_code: embed
     vertical_layout: fill
+    orientation: columns
+    css: style.css
 runtime: shiny
 ---
 
-```{r}
-library(shinydashboard)
-library(dashboardthemes)
-
-css <- 
-".section.sidebar {
-  top: 61px;
-  background-color: rgba(235, 104, 100, 0.15);
-}
-
-.bg-primary {
-  background-color: rgba(235, 104, 100, 0.7);
-}
-
-.nav-tabs-custom > .nav-tabs > li.active {
-  border-top-color: rgba(235, 104, 100, 0.7);
-}"
-
-ui <- fluidPage(
-  tags$head(tags$style(HTML(css))),
-  tags$p("Hello, world!")
-)
-
-server <- function(input, output, session) {
-}
-shinyApp(ui, server)
-```
 
 
 ```{r global, include=FALSE}
