@@ -33,15 +33,16 @@ head(hfai)
 # LOW TIER IS 0-9.5
 # MEDIUM TIER IS 9.6-19
 # HIGH TIER IS 19.1 - 28.5
-
-hfai <- hfai %>% 
+```
+```{r}
+hfai_for_joining <- hfai %>% 
   select(CSA2010, hfai15) %>% 
   mutate(hfai_category = case_when(
     hfai15 < 9.6 ~ "Low",
     hfai15 > 9.5 & hfai15 <= 19 ~ "Medium",
     hfai15 > 19 ~ "High"
-  ))
-hfai
+  ), hfai_boolean = ifelse(hfai15 < 9.6, 1, 0))
+hfai_for_joining
 ```
 
 
@@ -121,19 +122,33 @@ grocery_stores_2 <- cbind(grocery_stores[1:45,], csas_with_store) %>%
   mutate(store_number = 1:n()) %>% 
   pivot_wider(id_cols = csas_with_store, names_from = store_number, values_from = c(address, latitude, longitude, storename)) %>% 
   mutate(has_store = 1)
-
+```
+```{r}
 # create vector with CSA names
 
 csas <- data.frame(csa = vehicles$CSA2010)
 
-grocery_store_join <- left_join(csas, grocery_stores_2, by = join_by(csa == csas_with_store)) %>% 
+grocery_store_join <- left_join(csas, grocery_stores_2, by = join_by(csa == csas_with_store)) 
+grocery_store_join <- grocery_store_join %>%
   mutate(has_store = ifelse(is.na(grocery_store_join$has_store),0,1)) %>% 
   relocate(has_store, .after = csa) %>% 
   rename(CSA2010 = csa)
 head(grocery_store_join)
 ```
-
 ```{r}
+grocery_table_for_joining <- grocery_stores_csa %>%
+  mutate(groc_store = as.numeric(groc_store))
+  
+neighbourhood_priority_levels <- income_table_for_joining %>%
+  left_join(vehicle_table_for_joining, by = 'CSA2010') %>%
+  left_join(grocery_store_join, by = 'CSA2010') %>%
+  left_join(hfai_for_joining, by = 'CSA2010') %>%
+  mutate(number_criteria_met = income_boolean + vehicle_boolean + grocery_table_for_joining + hfai_for_joining, priority_level = case_when(number_criteria_met == 4 ~ 'High', number_criteria_met < 4 & number_criteria_met > 2 ~ 'Medium', number_criteria_met < 3 ~ 'Low'))
+
+neighbourhood_priority_levels
+```
+
+#```{r}
 contains_store <- function(n) {
   if(n %in% csas_with_store) {
     1
@@ -154,28 +169,27 @@ colnames(grocery_stores_csa) <- c("CSA2010", "groc_store")
 #length(vehicles$CSA2010)
 mapbaltimore::csas$name %in% vehicles$CSA2010
 #mapbaltimore::csas$name[51]
-```
+
 ### Which areas have over 30% of households without a vehicle available?
 
-```{r}
-library(dplyr)
 
-vehicles_30 <- vehicles %>% 
-  filter(novhcl22 > 30)
+### Joining income, vehicle, HFAI and grocery store data
+```{r}
+master_neighbourhood_data <- income_table_for_joining %>%
+  left_join(vehicle_table_for_joining, by = 'CSA2010') %>%
+  left_join(grocery_store_join, by = 'CSA2010') %>%
+  left_join(hfai_for_joining, by = 'CSA2010') %>%
+  mutate(
+    number_criteria_met = income_boolean + vehicle_boolean + has_store + hfai_boolean,
+    priority_level = case_when(
+      number_criteria_met == 4 ~ 'High',
+      number_criteria_met > 2 ~ 'Medium',
+      number_criteria_met < 3 ~ 'Low'
+    )
+  )
+master_neighbourhood_data
 ```
 
-### Joining income, vehicle and grocery store data
-```{r}
-grocery_table_for_joining <- grocery_stores_csa %>%
-  mutate(groc_store = as.numeric(groc_store))
-neighbourhood_priority_levels <- income_table_for_joining %>%
-  left_join(vehicle_table_for_joining, by = 'CSA2010') %>%
-  left_join(grocery_table_for_joining, by = 'CSA2010') %>%
-  mutate(number_criteria_met = income_boolean + vehicle_boolean + groc_store, hfai_priority = case_when(number_criteria_met == 3 ~ 'High', number_criteria_met == 2 ~ 'Medium', number_criteria_met < 2 ~ 'Low'))
-
-neighbourhood_priority_levels
-
-``` 
 # Loading demographic data from API
 
 ## Age
