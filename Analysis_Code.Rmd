@@ -172,13 +172,20 @@ mapbaltimore::csas$name %in% vehicles$CSA2010
 
 ### Which areas have over 30% of households without a vehicle available?
 
+# Getting multipolygons for each neighbourhood boundary
+```{r}
+library(mapbaltimore)
+csa_name_geometry <- mapbaltimore::csas %>%
+  rename(CSA2010 = name)
+```
 
-### Joining income, vehicle, HFAI and grocery store data
+### Joining income, vehicle, HFAI grocery store, and location data
 ```{r}
 master_neighbourhood_data <- income_table_for_joining %>%
   left_join(vehicle_table_for_joining, by = 'CSA2010') %>%
   left_join(grocery_store_join, by = 'CSA2010') %>%
   left_join(hfai_for_joining, by = 'CSA2010') %>%
+  left_join(csa_name_geometry, by = "CSA2010") %>%
   mutate(
     number_criteria_met = income_boolean + vehicle_boolean + has_store + hfai_boolean,
     priority_level = case_when(
@@ -189,6 +196,8 @@ master_neighbourhood_data <- income_table_for_joining %>%
   )
 master_neighbourhood_data
 ```
+
+# Joining master neighbourhood data with multipolygon coordinate data from mapbaltimore package 
 
 # Loading demographic data from API
 
