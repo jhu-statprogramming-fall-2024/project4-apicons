@@ -34,13 +34,14 @@ head(hfai)
 # MEDIUM TIER IS 9.6-19
 # HIGH TIER IS 19.1 - 28.5
 
-hfai %>% 
+hfai <- hfai %>% 
   select(CSA2010, hfai15) %>% 
   mutate(hfai_category = case_when(
     hfai15 < 9.6 ~ "Low",
     hfai15 > 9.5 & hfai15 <= 19 ~ "Medium",
     hfai15 > 19 ~ "High"
   ))
+hfai
 ```
 
 
