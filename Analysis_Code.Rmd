@@ -135,18 +135,7 @@ grocery_store_join <- grocery_store_join %>%
   rename(CSA2010 = csa)
 head(grocery_store_join)
 ```
-```{r}
-grocery_table_for_joining <- grocery_stores_csa %>%
-  mutate(groc_store = as.numeric(groc_store))
-  
-neighbourhood_priority_levels <- income_table_for_joining %>%
-  left_join(vehicle_table_for_joining, by = 'CSA2010') %>%
-  left_join(grocery_store_join, by = 'CSA2010') %>%
-  left_join(hfai_for_joining, by = 'CSA2010') %>%
-  mutate(number_criteria_met = income_boolean + vehicle_boolean + grocery_table_for_joining + hfai_for_joining, priority_level = case_when(number_criteria_met == 4 ~ 'High', number_criteria_met < 4 & number_criteria_met > 2 ~ 'Medium', number_criteria_met < 3 ~ 'Low'))
 
-neighbourhood_priority_levels
-```
 
 #```{r}
 contains_store <- function(n) {
@@ -196,6 +185,11 @@ master_neighbourhood_data <- income_table_for_joining %>%
   )
 master_neighbourhood_data
 ```
+
+```{r}
+write_csv(master_neighbourhood_data, "master_neighbourhood_data.csv")
+```
+
 
 # Joining master neighbourhood data with multipolygon coordinate data from mapbaltimore package 
 
