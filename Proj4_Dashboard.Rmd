@@ -15,7 +15,8 @@ runtime: shiny
 
 ```{r global, include=FALSE}
 # load data in 'global' chunk so it can be shared by all users of the dashboard
-
+master_url <- "https://raw.githubusercontent.com/jhu-statprogramming-fall-2024/project4-apicons/refs/heads/main/master_neighbourhood_data.csv"
+master_data <- read_csv(master_url)
 ```
 
 ```{r setup, include=FALSE}
