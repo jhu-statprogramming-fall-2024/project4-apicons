@@ -447,6 +447,22 @@ library(shiny)
 ```
 
 
+## Address Lookup Code  
+
+```{r}
+library(tidygeocoder)
+library(sf)
+grocery_stores
+nearest_store <- function(address, city, state, zip) {
+  address_to_geocode <- data.frame(address = 
+                      paste(address, ", ", city, ", ", state, " ", zip, sep = ""))
+  coordinates <- tidygeocoder::geocode(address_to_geocode, address, method = "osm")
+  coordinates
+}
+
+nearest_store("3250 E Fayette St", "Baltimore", "MD", "21224")
+
+```
 
 
 
