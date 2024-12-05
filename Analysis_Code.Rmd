@@ -458,10 +458,16 @@ nearest_store <- function(address, city, state, zip) {
                       paste(address, ", ", city, ", ", state, " ", zip, sep = ""))
   coordinates <- tidygeocoder::geocode(address_to_geocode, address, method = "osm")
   coordinates
+  point_sf <- st_as_sf(coordinates, coords = c('long', 'lat'))
+  point_sf
+  grocery_store_list <- st_as_sf(grocery_stores, coords = c('longitude', "latitude"))
+  st_nearest_feature(point_sf, grocery_store_list)
+  st_nearest_feature
 }
 
 nearest_store("3250 E Fayette St", "Baltimore", "MD", "21224")
 
+st_nearest_feature(event.coords.sf, locale.centroids.sf)
 ```
 
 
