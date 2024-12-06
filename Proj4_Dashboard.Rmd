@@ -7,10 +7,9 @@ output:
     source_code: embed
     vertical_layout: fill
     orientation: columns
-    css: style.css
+    style: css
 runtime: shiny
 ---
-
 
 
 ```{r global, include=FALSE}
