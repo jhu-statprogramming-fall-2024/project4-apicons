@@ -11,7 +11,6 @@ output:
 runtime: shiny
 ---
 
-
 ```{r global, include=FALSE}
 # load data in 'global' chunk so it can be shared by all users of the dashboard
 master_url <- "https://raw.githubusercontent.com/jhu-statprogramming-fall-2024/project4-apicons/refs/heads/main/master_neighbourhood_data.csv"
@@ -31,14 +30,74 @@ library(mapbaltimore)
 
 # Welcome and Introduction
 
-
 # Categorization of Baltimore Neighborhoods
-
 
 # Find Your Nearest Grocery Store
 
 
+------------------------------------------------------------------------
+
+```{r}
+#define address lookup function
+
+grocery_store_url <- "https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Grocery_Store/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
+
+jsonData <- read_json(grocery_store_url, simplifyVector = TRUE)
+
+grocery_stores <- jsonData$features$attributes
+
+library(tidygeocoder)
+library(sf)
+library(geosphere)
+
+nearest_store <- function(address, city, state, zip) {
+   if (missing(address) | missing(city) | missing(state) | missing(zip)){
+    stop('Please enter a valid address including street address, city, state, and zip code.')
+  }
+  address_to_geocode <- data.frame(address = 
+                      paste(address, ", ", city, ", ", state, " ", zip, sep = ""))
+ 
+  coordinates <- suppressMessages(tidygeocoder::geocode(address_to_geocode, address, method = "osm"))
+  address.coords <- data.frame(
+    lats = coordinates$lat,
+    lons = coordinates$long)
+  
+  grocery.store.coords <-
+   data.frame(
+    name = grocery_stores$storename,
+    address_groc = grocery_stores$address,
+    lats_ = grocery_stores$latitude,
+    lons_ = grocery_stores$longitude)
+  
+  new <- grocery.store.coords %>% rowwise() %>%
+  mutate(new =  map(list(c(lons_, lats_)), ~ address.coords %>% rowwise() %>%
+                      mutate(dist = distGeo((c(lons, lats)), .x)) %>%
+                      ungroup %>%
+                      filter(dist == min(dist))))  %>%
+  ungroup() %>% unnest_wider(new) %>% 
+  filter(dist == min(dist)) 
+  
+  distance <- round(new$dist*0.000621371,2)
+  
+    paste0("Your nearest grocery store is ", new$name, " at ", new$address_groc, ".", " It is ", distance, " miles from your inputted address, ", paste(address, ", ", city, ", ", state, " ", zip, sep = ""), ".")
+}
+```
+
+
+```{r}
+
+h1(strong("Find your nearest grocery store!"), style = "font-size:30px;")
+
+textInput('address', "Street Address", value = "", width = NULL, placeholder = NULL)
+textInput('city', "City", value = "", width = NULL, placeholder = NULL)
+textInput('state', "State", value = "", width = NULL, placeholder = NULL)
+textInput('zip', "Zip Code", value = "", width = NULL, placeholder = NULL)
+
+store <- eventReactive(c(input$zip), {nearest_store(input$address, input$city, input$state, input$zip)})
+
+#actionButton(input$city, "Run!")
+
+renderText(store())
+```
+
 # Demographic Characteristics of Baltimore Neighborhoods
-
-
-# Comparison to Prior Study Prior to Pandemic
