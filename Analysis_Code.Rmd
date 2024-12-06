@@ -445,22 +445,47 @@ library(shiny)
 ```{r}
 library(tidygeocoder)
 library(sf)
+library(geosphere)
 grocery_stores
 nearest_store <- function(address, city, state, zip) {
   address_to_geocode <- data.frame(address = 
                       paste(address, ", ", city, ", ", state, " ", zip, sep = ""))
   coordinates <- tidygeocoder::geocode(address_to_geocode, address, method = "osm")
-  coordinates
-  point_sf <- st_as_sf(coordinates, coords = c('long', 'lat'))
+  map(.x = asplit(grocery_stores[,2:3], 1), .f = ~ distGeo(c(coordinates$long, coordinates$lat), .x))
+  
+}
+
+
+  address_to_geocode <- data.frame(address = 
+                      "3250 E Fayette St", "Baltimore", "MD", "21224")
+  coordinates <- tidygeocoder::geocode(address_to_geocode, address, method = "osm")
+  map(.x = asplit(grocery_stores[,3:2],1), .f = ~ distGeo(p1 = matrix(c(coordinates$long, coordinates$lat),byrow=T,nrow=1), p2 = .x))
+  
+list(c(grocery_stores$longitude, grocery_stores$latitude))
+
+asplit(grocery_stores[,3:2],1)
+nearest_store("3250 E Fayette St", "Baltimore", "MD", "21224")
+
+point_sf <- st_as_sf(coordinates, coords = c('long', 'lat'))
   point_sf
   grocery_store_list <- st_as_sf(grocery_stores, coords = c('longitude', "latitude"))
   st_nearest_feature(point_sf, grocery_store_list)
   st_nearest_feature
-}
-
-nearest_store("3250 E Fayette St", "Baltimore", "MD", "21224")
-
 st_nearest_feature(event.coords.sf, locale.centroids.sf)
+
+map(c(grocery_stores$longitude, grocery_stores$latitude), distGeo(p1 = c(coordinates$long, coordinates$lat), p2 = .x))
+
+
+coordinates %>% 
+  distGeo(c(long, lat), c())
+
+event.coords %>% rowwise() %>%
+  mutate(new =  map(list(c(lons, lats)), ~ locale.centroids %>% rowwise() %>%
+                      mutate(dist = distGeo((c(lons, lats)), .x)) %>%
+                      ungroup %>%
+                      filter(dist == min(dist)) %>%
+                      select(locale.id, dist)))  %>%
+  ungroup() %>% unnest_wider(new)
 ```
 
 
