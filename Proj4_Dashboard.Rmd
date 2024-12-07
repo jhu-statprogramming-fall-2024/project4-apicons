@@ -14,7 +14,7 @@ runtime: shiny
 ```{r global, include=FALSE}
 # load data in 'global' chunk so it can be shared by all users of the dashboard
 master_url <- "https://raw.githubusercontent.com/jhu-statprogramming-fall-2024/project4-apicons/refs/heads/main/master_neighbourhood_data.csv"
-master_data <- read_csv(master_url)
+master_data <- read.csv(master_url)
 ```
 
 ```{r setup, include=FALSE}
@@ -34,6 +34,7 @@ library(bslib)
 ```
 
 # Welcome and Introduction
+Welcome! This is a project created by three Biostatistics ScM students at Johns Hopkins University. We are exploring food accessibility in Baltimore by neighborhood. We will be looking at the distribution of grocery stores in Baltimore, the demographic characteristics of neighborhoods, and the accessibility of grocery stores in Baltimore. This is a resource for residents of Baltimore to find their nearest grocery store and learn more about their neighborhood, or for policymakers who are seeking a broad overview of food accessibility in Baltimore.
 
 # Categorization of Baltimore Neighborhoods
 
@@ -53,6 +54,12 @@ master_data_with_geometry <- st_as_sf(master_data_with_geometry)
 
 # Transform CRS to 4326 (needed to interpret the multipolygon values)
 master_data_with_geometry <- st_transform(master_data_with_geometry, crs = 4326)
+
+# define factor for colours 
+master_data_with_geometry$priority_level <- factor(
+  master_data_with_geometry$priority_level,
+  levels = c("High", "Medium", "Low")
+)
 
 #Set colour levels (for low medium and high categories) 
 pal <- colorFactor(
@@ -86,7 +93,12 @@ leaflet(master_data_with_geometry) %>%
       direction = "auto"                   # Automatically adjust label placement
     )
   ) %>%
-  addLegend(pal = pal, values = ~priority_level, title = "Neighbourhood Healthy Food Priority Level", position = "bottomright"
+  addLegend(
+    position = "bottomright",
+    colors = c("red", "yellow", "green"),         # Explicit color assignment
+    labels = c("High", "Medium", "Low"),          # Explicit labels in desired order
+    opacity = 0.7,
+    title = "Neighbourhood Healthy Food Priority Level"
   )
 ```
 
