@@ -45,8 +45,7 @@ csa_name_geometry <- mapbaltimore::csas %>%
   rename(CSA2010 = name)
 
 # Adding geometries to master neighbourhood data 
-master_neighbourhood_data <- read_csv("master_neighbourhood_data.csv")
-master_data_with_geometry <- master_neighbourhood_data %>% 
+master_data_with_geometry <- master_data %>% 
   left_join(csa_name_geometry, by = "CSA2010") 
 
 #Turn into SF object
@@ -69,8 +68,23 @@ leaflet(master_data_with_geometry) %>%
     weight = 1,            # Border thickness
     fillColor = ~pal(priority_level), # Fill color
     fillOpacity = 0.7,     # Transparency of the fill
-    popup = ~paste0("Neighborhood: ", CSA2010, "<br>Category: ", priority_level),
-    label = ~CSA2010
+    popup = ~paste0(
+      "<strong>Neighborhood:</strong> ", CSA2010, "<br>",
+      "<strong>Median Income:</strong> $", format(median_income, big.mark = ","), "<br>",
+      "<strong>Percent Without Vehicle:</strong> ", round(percnt_no_vehicle, 1), "%<br>",
+      "<strong>Has Grocery Store:</strong> ", ifelse(has_store == 1, "Yes", "No")
+    ),
+    label = ~paste0(
+      CSA2010, "<br>",
+      "Median Income: $", format(median_income, big.mark = ","), "<br>",
+      "No Vehicle: ", round(percnt_no_vehicle, 1), "%<br>",
+      "Grocery Store: ", ifelse(has_store == 1, "Yes", "No")
+    ),
+    labelOptions = labelOptions(
+      style = list("font-weight" = "bold"), # Bold text
+      textsize = "12px",                   # Font size
+      direction = "auto"                   # Automatically adjust label placement
+    )
   ) %>%
   addLegend(pal = pal, values = ~priority_level, title = "Neighbourhood Healthy Food Priority Level", position = "bottomright"
   )
