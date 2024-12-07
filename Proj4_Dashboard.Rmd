@@ -37,11 +37,49 @@ library(bslib)
 
 # Categorization of Baltimore Neighborhoods
 
+Map of Baltimore neighborhoods with priority levels
+
+```{r}
+#Getting neighbourhood boundary geometries
+csa_name_geometry <- mapbaltimore::csas %>%
+  rename(CSA2010 = name)
+
+# Adding geometries to master neighbourhood data 
+master_neighbourhood_data <- read_csv("master_neighbourhood_data.csv")
+master_data_with_geometry <- master_neighbourhood_data %>% 
+  left_join(csa_name_geometry, by = "CSA2010") 
+
+#Turn into SF object
+master_data_with_geometry <- st_as_sf(master_data_with_geometry)
+
+# Transform CRS to 4326 (needed to interpret the multipolygon values)
+master_data_with_geometry <- st_transform(master_data_with_geometry, crs = 4326)
+
+#Set colour levels (for low medium and high categories) 
+pal <- colorFactor(
+  palette = c("red", "yellow", "green"), 
+  domain = master_data_with_geometry$priority_level
+)
+
+#Plot map with colour coded neighbourhoods by priority level
+leaflet(master_data_with_geometry) %>%
+  addTiles() %>%  # Add base map tiles
+  addPolygons(
+    color = "blue",        # Border color
+    weight = 1,            # Border thickness
+    fillColor = ~pal(priority_level), # Fill color
+    fillOpacity = 0.7,     # Transparency of the fill
+    popup = ~paste0("Neighborhood: ", CSA2010, "<br>Category: ", priority_level),
+    label = ~CSA2010
+  ) %>%
+  addLegend(pal = pal, values = ~priority_level, title = "Neighbourhood Healthy Food Priority Level", position = "bottomright"
+  )
+```
+
 # Find Your Nearest Grocery Store
 
-## Column
-
 ### Address Lookup
+
 ```{r}
 #define address lookup function
 
@@ -117,7 +155,6 @@ coords <- function(address, city, state, zip) {
   addMarkers(lng=new$lons_, lat=new$lats_, popup=new$name)
 }
 ```
-
 
 ```{r}
 h1(strong("Find your nearest grocery store!"), style = "font-size:30px;")
