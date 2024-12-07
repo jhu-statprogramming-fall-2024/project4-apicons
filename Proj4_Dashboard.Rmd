@@ -26,6 +26,11 @@ library(dplyr)
 library(tidyverse)
 library(jsonlite)
 library(mapbaltimore)
+library(leaflet)
+library(tidygeocoder)
+library(sf)
+library(geosphere)
+library(bslib)
 ```
 
 # Welcome and Introduction
@@ -34,9 +39,9 @@ library(mapbaltimore)
 
 # Find Your Nearest Grocery Store
 
+## Column
 
-------------------------------------------------------------------------
-
+### Address Lookup
 ```{r}
 #define address lookup function
 
@@ -46,13 +51,9 @@ jsonData <- read_json(grocery_store_url, simplifyVector = TRUE)
 
 grocery_stores <- jsonData$features$attributes
 
-library(tidygeocoder)
-library(sf)
-library(geosphere)
-
 nearest_store <- function(address, city, state, zip) {
-   if (missing(address) | missing(city) | missing(state) | missing(zip)){
-    stop('Please enter a valid address including street address, city, state, and zip code.')
+   if (address == "" | city == ""){
+    stop('Please enter a valid address including at minimum street address and city.')
   }
   address_to_geocode <- data.frame(address = 
                       paste(address, ", ", city, ", ", state, " ", zip, sep = ""))
@@ -79,25 +80,72 @@ nearest_store <- function(address, city, state, zip) {
   
   distance <- round(new$dist*0.000621371,2)
   
-    paste0("Your nearest grocery store is ", new$name, " at ", new$address_groc, ".", " It is ", distance, " miles from your inputted address, ", paste(address, ", ", city, ", ", state, " ", zip, sep = ""), ".")
+  first <- paste0("Your nearest grocery store is ", new$name, " at ", new$address_groc, ".")
+  
+  second <- paste0("It is ", distance, " miles from your inputted address, ", paste(address, ", ", city, ", ", state, " ", zip, sep = ""), ".")
+  
+   return(c(first, second))
+}
+
+coords <- function(address, city, state, zip) {
+  address_to_geocode <- data.frame(address = 
+                      paste(address, ", ", city, ", ", state, " ", zip, sep = ""))
+ 
+  coordinates <- suppressMessages(tidygeocoder::geocode(address_to_geocode, address, method = "osm"))
+  
+    address.coords <- data.frame(
+    lats = coordinates$lat,
+    lons = coordinates$long)
+  
+  grocery.store.coords <-
+   data.frame(
+    name = grocery_stores$storename,
+    address_groc = grocery_stores$address,
+    lats_ = grocery_stores$latitude,
+    lons_ = grocery_stores$longitude)
+  
+  new <- grocery.store.coords %>% rowwise() %>%
+  mutate(new =  map(list(c(lons_, lats_)), ~ address.coords %>% rowwise() %>%
+                      mutate(dist = distGeo((c(lons, lats)), .x)) %>%
+                      ungroup %>%
+                      filter(dist == min(dist))))  %>%
+  ungroup() %>% unnest_wider(new) %>% 
+  filter(dist == min(dist)) 
+  
+  leaflet() %>%
+  addTiles() %>%
+  addMarkers(lng=new$lons_, lat=new$lats_, popup=new$name)
 }
 ```
 
 
 ```{r}
-
 h1(strong("Find your nearest grocery store!"), style = "font-size:30px;")
 
-textInput('address', "Street Address", value = "", width = NULL, placeholder = NULL)
-textInput('city', "City", value = "", width = NULL, placeholder = NULL)
-textInput('state', "State", value = "", width = NULL, placeholder = NULL)
-textInput('zip', "Zip Code", value = "", width = NULL, placeholder = NULL)
+ui <- fluidPage(
+  sidebarPanel(
+  textInput('address', "Street Address", value = "", width = NULL, placeholder = NULL),
+textInput('city', "City", value = "", width = NULL, placeholder = NULL),
+textInput('state', "State", value = "", width = NULL, placeholder = NULL),
+textInput('zip', "Zip Code", value = "", width = NULL, placeholder = NULL),
+actionButton("go", "Go"),
+  textOutput("add"), width = 5
+),
+mainPanel(
+  leafletOutput("map"), width = 7
+)
+)
 
-store <- eventReactive(c(input$zip), {nearest_store(input$address, input$city, input$state, input$zip)})
+server <- function(input, output) {
+  
+  store <- eventReactive(input$go, {nearest_store(input$address, input$city, input$state, input$zip)})
+  c <- eventReactive(input$go, {coords(input$address, input$city, input$state, input$zip)})
 
-#actionButton(input$city, "Run!")
+  output$add <- renderText(store())
+  output$map <- renderLeaflet(c())
+}
 
-renderText(store())
+shinyApp(ui, server)
 ```
 
 # Demographic Characteristics of Baltimore Neighborhoods
