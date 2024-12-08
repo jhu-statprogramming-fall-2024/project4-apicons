@@ -219,4 +219,31 @@ server <- function(input, output) {
 shinyApp(ui, server)
 ```
 
+### Map of Baltimore grocery stores
+```{r}
+# Create the leaflet map
+leaflet(master_data_with_geometry) %>%
+  addTiles() %>% # Add base map tiles
+  addPolygons(
+    color = "black",                 
+    weight = 1,                       
+    fillColor = "transparent",       
+    fillOpacity = 0,                
+    popup = ~paste0("<strong>Neighborhood:</strong> ", CSA2010), 
+    label = ~CSA2010,                 
+    labelOptions = labelOptions(
+      style = list("font-weight" = "bold"), 
+      textsize = "12px",
+      direction = "auto"
+    )
+  ) %>%
+  addMarkers(
+    data = grocery_stores,     
+    lng = ~longitude,          
+    lat = ~latitude,                
+    popup = ~paste0(
+      "<strong>Store Name:</strong> ", storename, "<br>",
+      "<strong>Address:</strong> ", address)
+  )
+```
 # Demographic Characteristics of Baltimore Neighborhoods
