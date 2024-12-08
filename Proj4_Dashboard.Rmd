@@ -33,8 +33,16 @@ library(geosphere)
 library(bslib)
 ```
 
-# Welcome and Introduction
-Welcome! This is a project created by three Biostatistics ScM students at Johns Hopkins University. We are exploring food accessibility in Baltimore by neighborhood. We will be looking at the distribution of grocery stores in Baltimore, the demographic characteristics of neighborhoods, and the accessibility of grocery stores in Baltimore. This is a resource for residents of Baltimore to find their nearest grocery store and learn more about their neighborhood, or for policymakers who are seeking a broad overview of food accessibility in Baltimore.
+# Welcome
+
+### Welcome 
+
+```{r}
+h1(strong("Welcome!"), style = "font-size:30px;")
+```
+
+
+This is a project created by three Biostatistics ScM students at Johns Hopkins University. We are exploring food accessibility in Baltimore by neighborhood. We will be looking at the distribution of grocery stores in Baltimore, the demographic characteristics of neighborhoods, and the accessibility of grocery stores in Baltimore. This is a resource for residents of Baltimore to find their nearest grocery store and learn more about their neighborhood, or for policymakers who are seeking a broad overview of food accessibility in Baltimore.
 
 # Categorization of Baltimore Neighborhoods
 
