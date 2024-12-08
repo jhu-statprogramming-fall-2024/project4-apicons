@@ -15,6 +15,8 @@ runtime: shiny
 # load data in 'global' chunk so it can be shared by all users of the dashboard
 master_url <- "https://raw.githubusercontent.com/jhu-statprogramming-fall-2024/project4-apicons/refs/heads/main/master_neighbourhood_data.csv"
 master_data <- read.csv(master_url)
+master_url_2018 <- "https://raw.githubusercontent.com/jhu-statprogramming-fall-2024/project4-apicons/refs/heads/main/master_neighbourhood_data_2018.csv"
+master_data_2018 <- read.csv(master_url_2018)
 ```
 
 ```{r setup, include=FALSE}
@@ -110,6 +112,83 @@ leaflet(master_data_with_geometry) %>%
   )
 ```
 
+
+## 2018 Map with priority levels
+```{r}
+#Getting neighbourhood boundary geometries
+csa_name_geometry <- mapbaltimore::csas %>%
+  rename(CSA2010 = name)
+
+# Adding geometries to master neighbourhood data 
+master_data_with_geometry_2018 <- master_data_2018 %>% 
+  left_join(csa_name_geometry, by = "CSA2010") 
+
+#Turn into SF object
+master_data_with_geometry_2018 <- st_as_sf(master_data_with_geometry_2018)
+
+# Transform CRS to 4326 (needed to interpret the multipolygon values)
+master_data_with_geometry_2018 <- st_transform(master_data_with_geometry_2018, crs = 4326)
+
+# define factor for colours 
+master_data_with_geometry_2018$priority_level <- factor(
+  master_data_with_geometry_2018$priority_level,
+  levels = c("High", "Medium", "Low")
+)
+
+#Set colour levels (for low medium and high categories) 
+pal <- colorFactor(
+  palette = c("red", "yellow", "green"), 
+  domain = master_data_with_geometry_2018$priority_level
+)
+
+#Plot map with colour coded neighbourhoods by priority level
+leaflet(master_data_with_geometry_2018) %>%
+  addTiles() %>%  # Add base map tiles
+  addPolygons(
+    color = "blue",        # Border color
+    weight = 1,            # Border thickness
+    fillColor = ~pal(priority_level), # Fill color
+    fillOpacity = 0.7,     # Transparency of the fill
+    popup = ~paste0(
+      "<strong>Neighborhood:</strong> ", CSA2010, "<br>",
+      "<strong>Median Income:</strong> $", format(median_income, big.mark = ","), "<br>",
+      "<strong>Percent Without Vehicle:</strong> ", round(percnt_no_vehicle, 1), "%<br>",
+      "<strong>Has Grocery Store:</strong> ", ifelse(has_store == 1, "Yes", "No")
+    ),
+    label = ~paste0(
+      CSA2010, "<br>",
+      "Median Income: $", format(median_income, big.mark = ","), "<br>",
+      "No Vehicle: ", round(percnt_no_vehicle, 1), "%<br>",
+      "Grocery Store: ", ifelse(has_store == 1, "Yes", "No")
+    ),
+    labelOptions = labelOptions(
+      style = list("font-weight" = "bold"), # Bold text
+      textsize = "12px",                   # Font size
+      direction = "auto"                   # Automatically adjust label placement
+    )
+  ) %>%
+  addLegend(
+    position = "bottomright",
+    colors = c("red", "yellow", "green"),         # Explicit color assignment
+    labels = c("High", "Medium", "Low"),          # Explicit labels in desired order
+    opacity = 0.7,
+    title = "Neighbourhood Healthy Food Priority Level"
+  )
+```
+
+### Seeing which neighbourhoods changed category
+```{r}
+comparison_data <- master_data %>%
+  inner_join(master_data_2018, by = "CSA2010", suffix = c("_master", "_master_2018"))
+
+# Filter for rows where `priority_level` is not identical between the two datasets
+changed_priority <- comparison_data %>%
+  filter(priority_level_master != priority_level_master_2018) %>%
+  select(CSA2010) # Select the CSA2010 column
+
+# View the CSA2010 values where priority_level differs
+print(changed_priority)
+```
 # Find Your Nearest Grocery Store
 
 ### Address Lookup
