@@ -5,7 +5,7 @@ output:
   flexdashboard::flex_dashboard: 
     social: menu
     source_code: embed
-    vertical_layout: fill
+    vertical_layout: scroll
     orientation: columns
     style: css
 runtime: shiny
