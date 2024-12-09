@@ -17,6 +17,8 @@ master_url <- "https://raw.githubusercontent.com/jhu-statprogramming-fall-2024/p
 master_data <- read.csv(master_url)
 master_url_2018 <- "https://raw.githubusercontent.com/jhu-statprogramming-fall-2024/project4-apicons/refs/heads/main/master_neighbourhood_data_2018.csv"
 master_data_2018 <- read.csv(master_url_2018)
+demo_master_url <- "https://raw.githubusercontent.com/jhu-statprogramming-fall-2024/project4-apicons/refs/heads/main/demo_master_data.csv"
+demo_master_data <- read.csv(demo_master_url)
 ```
 
 ```{r setup, include=FALSE}
