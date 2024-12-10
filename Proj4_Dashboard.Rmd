@@ -243,20 +243,65 @@ leaflet(master_data_with_geometry_2018) %>%
 comparison_data <- master_data %>%
   inner_join(master_data_2018, by = "CSA2010", suffix = c("_master", "_master_2018"))
 
-# Filter for rows where `priority_level` is not identical between the two datasets
-changed_priority <- comparison_data %>%
-  filter(priority_level_master != priority_level_master_2018) %>%
-  select(CSA2010) # Select the CSA2010 column
+# Adding geometries to master neighbourhood data 
+comparsion_data_with_geometry <- comparison_data %>%
+  left_join(csa_name_geometry, by = "CSA2010") 
 
-# View the CSA2010 values where priority_level differs
-print(changed_priority)
+#Turn into SF object
+comparison_data_with_geometry <- st_as_sf(comparison_data_with_geometry)
+
+# Transform CRS to 4326 (needed to interpret the multipolygon values)
+comparison_data_with_geometry <- st_transform(comparison_data_with_geometry, crs = 4326)
+
+# Plot
+comparison_data <- comparison_data %>%
+  mutate(comparison = ifelse(priority_level_master == priority_level_master_2018, "No Change", "Change")) 
+priority_levels <- c("Low", "Medium", "High")
+
+# Retain wide format for geom_segment
+changed_categories_wide <- comparison_data %>%
+  filter(comparison == "Change") %>%
+  select(CSA2010, priority_level_master_2018, priority_level_master)
+
+# Long format for colored points
+changed_categories_long <- changed_categories_wide %>%
+  pivot_longer(
+    cols = c(priority_level_master_2018, priority_level_master),
+    names_to = "year",
+    values_to = "priority_level"
+  ) %>%
+  mutate(priority_level = factor(priority_level, levels = priority_levels),
+         year = ifelse(year == "priority_level_master_2018", "2018", "2022"))
+
+# Dumbbell plot
+ggplot() +
+  # Add connecting segments using wide data
+  geom_segment(data = changed_categories_wide,
+               aes(x = priority_level_master_2018, 
+                   xend = priority_level_master, 
+                   y = CSA2010, 
+                   yend = CSA2010), 
+               color = "grey") +
+  # Add points using long data
+  geom_point(data = changed_categories_long,
+             aes(x = priority_level, y = CSA2010, color = year),
+             size = 3) +
+  scale_color_manual(values = c("2018" = "pink", "2022" = "red")) +
+  labs(
+    x = "Priority Level", 
+    y = "Neighborhood", 
+    title = "Changes in Priority Levels (2018 to 2022)",
+    color = "Year"
+  ) +
+  theme_minimal() +
+  theme(axis.text.y = element_text(size = 10))  # Adjust axis text size
+
 ```
 
 # Find Your Nearest Grocery Store
 
 ### Address Lookup
 
-```{r}
 #define address lookup function
 
 grocery_store_url <- "https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Grocery_Store/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
