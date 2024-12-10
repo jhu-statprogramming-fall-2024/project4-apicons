@@ -152,13 +152,11 @@ leaflet(master_data_with_geometry) %>%
       "<strong>Neighborhood:</strong> ", CSA2010, "<br>",
       "<strong>Median Income:</strong> $", format(median_income, big.mark = ","), "<br>",
       "<strong>Percent Without Vehicle:</strong> ", round(percnt_no_vehicle, 1), "%<br>",
+      "<strong>Healthy Food Availability Index Score:</strong> ", hfai_category, "<br>",
       "<strong>Has Grocery Store:</strong> ", ifelse(has_store == 1, "Yes", "No")
     ),
     label = ~paste0(
-      CSA2010, "<br>",
-      "Median Income: $", format(median_income, big.mark = ","), "<br>",
-      "No Vehicle: ", round(percnt_no_vehicle, 1), "%<br>",
-      "Grocery Store: ", ifelse(has_store == 1, "Yes", "No")
+      CSA2010
     ),
     labelOptions = labelOptions(
       style = list("font-weight" = "bold"), # Bold text
