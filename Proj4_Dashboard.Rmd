@@ -244,7 +244,7 @@ comparison_data <- master_data %>%
   inner_join(master_data_2018, by = "CSA2010", suffix = c("_master", "_master_2018"))
 
 # Adding geometries to master neighbourhood data 
-comparsion_data_with_geometry <- comparison_data %>%
+comparison_data_with_geometry <- comparison_data %>%
   left_join(csa_name_geometry, by = "CSA2010") 
 
 #Turn into SF object
@@ -303,7 +303,7 @@ ggplot() +
 ### Address Lookup
 
 #define address lookup function
-
+```{r}
 grocery_store_url <- "https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Grocery_Store/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
 
 jsonData <- read_json(grocery_store_url, simplifyVector = TRUE)
