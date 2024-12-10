@@ -110,7 +110,11 @@ knitr::include_graphics("safeway.jpg")
 
 # Categorization of Baltimore Neighborhoods
 
-Map of Baltimore neighborhoods with priority levels
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+```{r}
+h1(strong("Map of Baltimore neighborhoods with 2022 Healthy Food Priority Levels"), style = "font-size:30px;")
+```
 
 ```{r}
 #Getting neighbourhood boundary geometries
@@ -172,7 +176,9 @@ leaflet(master_data_with_geometry) %>%
   )
 ```
 
-## 2018 Map with priority levels
+```{r}
+h1(strong("Map of Baltimore neighborhoods with 2018 Healthy Food Priority Levels"), style = "font-size:30px;")
+```
 
 ```{r}
 #Getting neighbourhood boundary geometries
@@ -237,11 +243,25 @@ leaflet(master_data_with_geometry_2018) %>%
   )
 ```
 
-### Seeing which neighbourhoods changed category
+Row
+-----------------------------------------------------------------------
+```{r}
+h1(strong("Exploring the neighborhoods which experienced a change in Healthy Food Priority Level"), style = "font-size:30px;")
+```
 
 ```{r}
+h2(strong("Map of Baltimore neighborhoods which changed priority level between 2018 and 2022"), style = "font-size:30px;")
+```
+
+```{r}
+
 comparison_data <- master_data %>%
   inner_join(master_data_2018, by = "CSA2010", suffix = c("_master", "_master_2018"))
+
+# Plot
+comparison_data <- comparison_data %>%
+  mutate(comparison = ifelse(priority_level_master == priority_level_master_2018, "No Change", "Change")) 
+priority_levels <- c("Low", "Medium", "High")
 
 # Adding geometries to master neighbourhood data 
 comparison_data_with_geometry <- comparison_data %>%
@@ -253,11 +273,46 @@ comparison_data_with_geometry <- st_as_sf(comparison_data_with_geometry)
 # Transform CRS to 4326 (needed to interpret the multipolygon values)
 comparison_data_with_geometry <- st_transform(comparison_data_with_geometry, crs = 4326)
 
-# Plot
-comparison_data <- comparison_data %>%
-  mutate(comparison = ifelse(priority_level_master == priority_level_master_2018, "No Change", "Change")) 
-priority_levels <- c("Low", "Medium", "High")
 
+pal <- colorFactor(
+  palette = c("pink", "white"), 
+  domain = comparison_data_with_geometry$comparison
+)
+
+leaflet(comparison_data_with_geometry) %>%
+addTiles() %>%  # Add base map tiles
+addPolygons(
+color = "blue",        # Border color
+weight = 1,            # Border thickness
+fillColor = ~pal(comparison), # Fill color
+fillOpacity = 0.7,     # Transparency of the fill
+popup = ~paste0(
+"<strong>Priority level in 2018:</strong> ", priority_level_master_2018, "<br>",
+"<strong>Priority level in 2022:</strong> ", priority_level_master
+),
+label = ~paste0(
+CSA2010
+),
+labelOptions = labelOptions(
+style = list("font-weight" = "bold"), # Bold text
+textsize = "12px",                   # Font size
+direction = "auto"                   # Automatically adjust label placement
+)
+) %>%
+addLegend(
+position = "bottomright",
+colors = c("pink", "white"),         # Explicit color assignment
+labels = c("Changed category", "No change"),          # Explicit labels in desired order
+opacity = 0.7,
+title = "Changed category between 2018 and 2022"
+)
+```
+
+```{r}
+h2(strong("Dumbbell plot of Baltimore neighborhood names which changed priority level between 2018 and 2022"), style = "font-size:30px;")
+```
+
+```{r}
 # Retain wide format for geom_segment
 changed_categories_wide <- comparison_data %>%
   filter(comparison == "Change") %>%
@@ -472,6 +527,11 @@ demo_master_data %>%
 
 ### Address Lookup
 
+<<<<<<< HEAD
+=======
+#define address lookup function
+
+>>>>>>> 3795a13 (Small fixes)
 ```{r}
 grocery_store_url <- "https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Grocery_Store/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
 
@@ -503,6 +563,7 @@ nearest_store <- function(address, city, state, zip) {
                       mutate(dist = distGeo((c(lons, lats)), .x)) %>%
                       ungroup %>%
                       filter(dist == min(dist))))  %>%
+
   ungroup() %>% unnest_wider(new) %>% 
   filter(dist == min(dist)) 
   
