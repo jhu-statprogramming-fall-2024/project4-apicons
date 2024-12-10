@@ -356,6 +356,50 @@ pop_asian <- jsonData$features$attributes %>%
 head(pop_asian)
 ```
 
+### Percent Population (25 Years and over) With Less Than a High School Diploma or GED
+
+```{r}
+library(jsonlite)
+library(tidyverse)
+
+pop_no_hs_degree <- "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Lesshs/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
+
+jsonData <- read_json(pop_no_hs_degree, simplifyVector = TRUE)
+
+pop_no_hs_degree <- jsonData$features$attributes %>% 
+  select(OBJECTID, CSA2010, lesshs21, Shape__Area, Shape__Length)
+
+head(pop_no_hs_degree)
+```
+
+### Percent Population (25 Years and over) With High School Diploma and Some College or Associates Degree
+
+```{r}
+library(jsonlite)
+library(tidyverse)
+
+pop_hs_degree <- "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hsdipl/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
+
+jsonData <- read_json(pop_hs_degree, simplifyVector = TRUE)
+
+pop_hs_degree <- jsonData$features$attributes %>% 
+  select(OBJECTID, CSA2010, hsdipl21, Shape__Area, Shape__Length)
+
+head(pop_hs_degree)
+```
+
+### Joining demographic data with master neighbourhood data
+
+```{r}
+demo_data <- cbind(pop_children$CSA2010, pop_children$age18_22, pop_youngadult$age24_22, pop_adult$age64_22, pop_elderly$age65_22, rdi$racdiv22, pop_other$ppac22, pop_black$paa22, pop_white$pwhite22, pop_hispanic$phisp22, pop_asian$pasi22, pop_no_hs_degree$lesshs21, pop_hs_degree$hsdipl21)
+demo_data <- as.data.frame(demo_data)
+colnames(demo_data) <- c("CSA2010", "age18_22", "age24_22", "age64_22", "age65_22", "racdiv22", "ppac22", "paa22", "pwhite22", "phisp22", "pasi22", "lesshs21", "hsdipl21")
+# combine demo_data and master_data
+demo_master_data <- left_join(master_neighbourhood_data, demo_data, by = "CSA2010")
+write_csv(demo_master_data, "demo_master_data.csv")
+```
+
+
 # Demographics for areas with over 30% of households without a vehicle
 
 ```{r}
