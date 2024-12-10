@@ -392,16 +392,13 @@ leaflet(master_data_with_geometry) %>%
   )
 ```
 
-
 # Demographic Characteristics of Baltimore Neighborhoods
 
-Demographic Summary Statistics 
+Demographic Summary Statistics
 
+## Column
 
-Column 
-----------------------------------
-
-### Demographic Summary Statistics {data-width=400}
+### Demographic Summary Statistics {data-width="400"}
 
 ```{r}
 demo_master_stat <- demo_master_data %>% 
@@ -421,10 +418,9 @@ demo_summary <- demo_master_stat %>%
 datatable(demo_summary, options = list(pageLength = 36))
 ```
 
-Column 
-----------------------------------
+## Column
 
-### Bar Chart: Demographic Data by Priority Level {data-width=600}
+### Bar Chart: Demographic Data by Priority Level {data-width="600"}
 
 ```{r}
 demo_master_stat <- demo_master_data %>% 
@@ -452,10 +448,9 @@ demo_master_stat %>%
 
 Demographic Data Visualization
 
-Column
----------------------------------------
+## Column
 
-### Boxplot of age groups by priority level 
+### Boxplot of age groups by priority level
 
 ```{r}
 demo_master_data %>% 
@@ -508,8 +503,7 @@ demo_master_data %>%
        color = "Priority Level")
 ```
 
-Column
----------------------------------------
+## Column
 
 ### Stacked bar chart for race demographics and age groups by priority level
 
@@ -563,4 +557,3 @@ demo_master_data %>%
        y = "Education Level",
        fill = "Priority Level")
 ```
-
