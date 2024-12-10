@@ -8,6 +8,7 @@ output:
     orientation: columns
     theme: 
       version: 4
+    style: css  
 runtime: shiny
 ---
 
@@ -85,23 +86,21 @@ We used data from the [Open Baltimore API](https://data.baltimorecity.gov/) to c
 h1(strong("Dashboard Contents"), style = "font-size:24px;")
 ```
 
-```{r}
-h1(strong("Categorization of Baltimore Neighborhoods"), style = "font-size:15px;")
-```
+**Categorization of Baltimore Neighborhoods**  
 
-This page displays maps of Baltimore that indicate the priority level of each neighborhood, both today and in 2018. The maps also include information on food accessibility for each neighborhood.
+This page displays maps of Baltimore that indicate the priority level of each neighborhood, both today and in 2018, and highlights neighborhoods that changed categories of healthy food priority. The maps also include information on food accessibility for each neighborhood. 
 
-```{r}
-h1(strong("Find Your Nearest Grocery Store"), style = "font-size:15px;")
-```
-
-Visit this page to input your address and find the nearest grocery store. You can also find a map of all Baltimore grocery stores for your reference on this page.
-
-```{r}
-h1(strong("Demographic Characteristics of Baltimore Neighborhoods"), style = "font-size:15px;")
-```
+**Demographic Summary Statistics**
 
 Visit this page to learn about the demographic characteristics of Baltimore neighborhoods and how they relate to food accessibility.
+
+**Demographic Data Visualization**  
+
+This page includes visualizations of demographic data by priority level, such as bar charts and box plots.                                   
+
+**Find Your Nearest Grocery Store**
+
+Visit this page to input your address and find the nearest grocery store. You can also find a map of all Baltimore grocery stores for your reference on this page.
 
 ### Pictured below: Safeway in Canton
 
@@ -298,11 +297,180 @@ ggplot() +
 
 ```
 
+
+
+# Demographic Summary Statistics
+
+## Column
+
+### Demographic Summary Statistics {data-width="400"}
+
+```{r}
+demo_master_stat <- demo_master_data %>% 
+  select(priority_level, age18_22, age24_22, age64_22, age65_22, racdiv22, ppac22, paa22, pwhite22, phisp22, pasi22, lesshs21, hsdipl21) 
+colnames(demo_master_stat) <- c("Priority Level", "Percent Age 5-17", " Percent Age 18-24", " Percent Age 25-64", " Percent Age 65+", "RDI Index", "Percent Other", "Percent African American", "Percent White", "Percent Hispanic", "Percent Asian", " Percent Less than High School", "Percent High School Diploma")
+demo_summary <- demo_master_stat %>% 
+  mutate(`Priority Level` = factor(`Priority Level`, levels = c("Low", "Medium", "High"))) %>% 
+  group_by(`Priority Level`) %>% 
+  summarise(across(everything(), list(Mean = ~round(mean(.x, na.rm = TRUE), 4), 
+                                      Median = ~round(median(.x, na.rm = TRUE), 4),
+                                      SD = ~round(sd(.x, na.rm = TRUE), 4)))) %>% 
+  pivot_longer(-`Priority Level`, 
+               names_to = c("Demographic Category", "stat"), 
+               names_sep = "_") %>% 
+  pivot_wider(names_from = stat, values_from = value)
+
+datatable(demo_summary, options = list(pageLength = 36))
+```
+
+## Column
+
+### Bar Chart: Demographic Data by Priority Level {data-width="600"}
+
+```{r}
+demo_master_stat <- demo_master_data %>% 
+  select(priority_level, age18_22, age24_22, age64_22, age65_22, racdiv22, ppac22, paa22, pwhite22, phisp22, pasi22, lesshs21, hsdipl21) 
+colnames(demo_master_stat) <- c("Priority Level", "% Age 5-17", "% Age 18-24", "% Age 25-64", "% Age 65+", "RDI Index", "%  Other", "% African American", "% White", "% Hispanic", "% Asian", "% Less than HS", "% HS Diploma")
+demo_master_stat %>% 
+  mutate(`Priority Level` = factor(`Priority Level`, levels = c("Low", "Medium", "High"), labels = c("L", "M", "H"))) %>% 
+  pivot_longer(cols = `% Age 5-17`:`% HS Diploma`, 
+               names_to = "variable", 
+               values_to = "value") %>% 
+  group_by(`Priority Level`, variable) %>% 
+  mutate(variable = factor(variable, levels = c("Priority Level", "% Age 5-17", "% Age 18-24", "% Age 25-64", "% Age 65+", "RDI Index", "%  Other", "% African American", "% White", "% Hispanic", "% Asian", "% Less than HS", "% HS Diploma"))) %>% 
+  summarise(mean_value = mean(value, na.rm = TRUE)) %>% 
+  ggplot(aes(x = `Priority Level`, y = mean_value, fill = `Priority Level`)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(values = c("green", "yellow", "red")) +
+  facet_wrap(~variable, scales = "free_y") +
+  theme_minimal() +
+  theme(strip.text = element_text(size = 10, hjust = 0.5),
+    axis.text.x = element_text(size = 8),
+    plot.title = element_text(size = 14)) +
+  labs(title = "Demographic Categories by Priority Level",
+       x = "Priority Level",
+       y = " Mean Percent Value")
+```
+
+# Demographic Data Visualization
+
+## Column
+
+### Boxplot of age groups by priority level
+
+```{r}
+demo_master_data %>% 
+  mutate(priority_level = factor(priority_level, levels = c("Low", "Medium", "High"))) %>% 
+  select(priority_level, age18_22, age24_22, age64_22, age65_22) %>% 
+  pivot_longer(cols = -priority_level, 
+               names_to = "age_group", 
+               values_to = "value") %>% 
+  ggplot(aes(x = priority_level, y = value, fill = priority_level)) +
+  geom_boxplot() +
+  scale_fill_manual(values = c("green", "yellow", "red")) +
+  facet_wrap(~age_group, scales = "free_y", labeller = as_labeller(
+    c(age18_22 = "% Age 5-17",
+      age24_22 = "% Age 18-24",
+      age64_22 = "% Age 25-64",
+      age65_22 = "% Age 65+"))) +
+  theme_minimal() +
+  theme(strip.text = element_text(size = 10, hjust = 0.5)) +
+  labs(title = "Percent Age Distribution by Priority Level",
+       x = "Priority Level",
+       y = "Percent Value",
+       fill = "Priority Level")
+```
+
+### Line Chart for Race Demographics by Priority Level
+
+```{r}
+demo_master_data %>% 
+  mutate(priority_level = factor(priority_level, levels = c("Low", "Medium", "High"))) %>% 
+  pivot_longer(cols = c(ppac22, paa22, pwhite22, phisp22, pasi22), 
+               names_to = "race_variable", 
+               values_to = "value") %>% 
+  group_by(priority_level, race_variable) %>% 
+  summarise(mean_value = mean(value, na.rm = TRUE)) %>% 
+  ggplot(aes(x = race_variable, y = mean_value, group = priority_level, color = priority_level)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  scale_color_manual(values = c("green", "yellow", "red")) +
+  scale_x_discrete(labels = c(ppac22 = "% Other",
+                              paa22 = "% African American",
+                              pwhite22 = "% White",
+                              phisp22 = "% Hispanic",
+                              pasi22 = "% Asian")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+        plot.title = element_text(size = 12),
+        legend.title = element_text(size = 10),
+        legend.text = element_text(size = 8)) +
+  labs(title = "Average Percentage of Race Demographics by Priority Level",
+       x = "Race Demographic",
+       y = "Average Percent Value",
+       color = "Priority Level")
+```
+
+## Column
+
+### Stacked Bar Chart for Race Demographics and Age Groups by Priority Level
+
+```{r}
+demo_master_data %>% 
+  mutate(priority_level = factor(priority_level, levels = c("Low", "Medium", "High"))) %>%
+  pivot_longer(cols = c(ppac22, paa22, pwhite22, phisp22, pasi22), 
+               names_to = "variable", 
+               values_to = "value") %>% 
+  group_by(priority_level, variable) %>%
+  summarise(mean_value = mean(value, na.rm = TRUE)) %>% 
+  ggplot(aes(x = priority_level, y = mean_value, fill = variable)) +
+  geom_bar(stat = "identity", position = "stack") +
+  scale_fill_discrete(labels = c(
+                              ppac22 = "% Other",
+                              paa22 = "% African American",
+                              pwhite22 = "% White",
+                              phisp22 = "% Hispanic",
+                              pasi22 = "% Asian")) +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 11),
+        legend.title = element_text(size = 10),
+        legend.text = element_text(size = 8)) +
+  labs(title = "Stacked Bar Chart for Average Percentage of Racial Groups by Priority Level",
+       x = "Priority Level",
+       y = "Average Percent Value",
+       fill = "Demographic Category")
+```
+
+### Horizontal Bar Chart for Education Levels
+
+```{r}
+demo_master_data %>% 
+  pivot_longer(cols = c(lesshs21, hsdipl21), names_to = "education", values_to = "value") %>% 
+  group_by(priority_level, education) %>% 
+  summarise(mean_value = mean(value, na.rm = TRUE)) %>% 
+  mutate(priority_level = factor(priority_level, levels = c("Low", "Medium", "High")),
+         education = factor(education, levels = c("lesshs21", "hsdipl21"),
+                            labels = c("Less than High School", "High School Diploma"))) %>% 
+  ggplot(aes(x = mean_value, y = education, fill = priority_level)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(values = c("green", "yellow", "red")) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_text(size = 10),
+    plot.title = element_text(size = 12),
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 8)
+  ) +
+  labs(title = "Average Percentage of Education Levels by Priority Level",
+       x = "Average Percent Value",
+       y = "Education Level",
+       fill = "Priority Level")
+```
+
 # Find Your Nearest Grocery Store
 
 ### Address Lookup
 
-#define address lookup function
 ```{r}
 grocery_store_url <- "https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Grocery_Store/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
 
@@ -434,172 +602,3 @@ leaflet(master_data_with_geometry) %>%
       "<strong>Address:</strong> ", address)
   )
 ```
-
-# Demographic Summary Statistics
-
-## Column
-
-### Demographic Summary Statistics {data-width="400"}
-
-```{r}
-demo_master_stat <- demo_master_data %>% 
-  select(priority_level, age18_22, age24_22, age64_22, age65_22, racdiv22, ppac22, paa22, pwhite22, phisp22, pasi22, lesshs21, hsdipl21) 
-colnames(demo_master_stat) <- c("Priority Level", "Percent Age 5-17", " Percent Age 18-24", " Percent Age 25-64", " Percent Age 65+", "RDI Index", "Percent Other", "Percent African American", "Percent White", "Percent Hispanic", "Percent Asian", " Percent Less than High School", "Percent High School Diploma")
-demo_summary <- demo_master_stat %>% 
-  mutate(`Priority Level` = factor(`Priority Level`, levels = c("Low", "Medium", "High"))) %>% 
-  group_by(`Priority Level`) %>% 
-  summarise(across(everything(), list(Mean = ~round(mean(.x, na.rm = TRUE), 4), 
-                                      Median = ~round(median(.x, na.rm = TRUE), 4),
-                                      SD = ~round(sd(.x, na.rm = TRUE), 4)))) %>% 
-  pivot_longer(-`Priority Level`, 
-               names_to = c("Demographic Category", "stat"), 
-               names_sep = "_") %>% 
-  pivot_wider(names_from = stat, values_from = value)
-
-datatable(demo_summary, options = list(pageLength = 36))
-```
-
-## Column
-
-### Bar Chart: Demographic Data by Priority Level {data-width="600"}
-
-```{r}
-demo_master_stat <- demo_master_data %>% 
-  select(priority_level, age18_22, age24_22, age64_22, age65_22, racdiv22, ppac22, paa22, pwhite22, phisp22, pasi22, lesshs21, hsdipl21) 
-colnames(demo_master_stat) <- c("Priority Level", "% Age 5-17", "% Age 18-24", "% Age 25-64", "% Age 65+", "RDI Index", "%  Other", "% African American", "% White", "% Hispanic", "% Asian", "% Less than HS", "% HS Diploma")
-demo_master_stat %>% 
-  mutate(`Priority Level` = factor(`Priority Level`, levels = c("Low", "Medium", "High"), labels = c("L", "M", "H"))) %>% 
-  pivot_longer(cols = `% Age 5-17`:`% HS Diploma`, 
-               names_to = "variable", 
-               values_to = "value") %>% 
-  group_by(`Priority Level`, variable) %>% 
-  mutate(variable = factor(variable, levels = c("Priority Level", "% Age 5-17", "% Age 18-24", "% Age 25-64", "% Age 65+", "RDI Index", "%  Other", "% African American", "% White", "% Hispanic", "% Asian", "% Less than HS", "% HS Diploma"))) %>% 
-  summarise(mean_value = mean(value, na.rm = TRUE)) %>% 
-  ggplot(aes(x = `Priority Level`, y = mean_value, fill = `Priority Level`)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  scale_fill_manual(values = c("green", "yellow", "red")) +
-  facet_wrap(~variable, scales = "free_y") +
-  theme_minimal() +
-  theme(strip.text = element_text(size = 10, hjust = 0.5),
-    axis.text.x = element_text(size = 8),
-    plot.title = element_text(size = 14)) +
-  labs(title = "Demographic Categories by Priority Level",
-       x = "Priority Level",
-       y = " Mean Percent Value")
-```
-
-# Demographic Data Visualization
-
-## Column
-
-### Boxplot of age groups by priority level
-
-```{r}
-demo_master_data %>% 
-  mutate(priority_level = factor(priority_level, levels = c("Low", "Medium", "High"))) %>% 
-  select(priority_level, age18_22, age24_22, age64_22, age65_22) %>% 
-  pivot_longer(cols = -priority_level, 
-               names_to = "age_group", 
-               values_to = "value") %>% 
-  ggplot(aes(x = priority_level, y = value, fill = priority_level)) +
-  geom_boxplot() +
-  scale_fill_manual(values = c("green", "yellow", "red")) +
-  facet_wrap(~age_group, scales = "free_y", labeller = as_labeller(
-    c(age18_22 = "% Age 5-17",
-      age24_22 = "% Age 18-24",
-      age64_22 = "% Age 25-64",
-      age65_22 = "% Age 65+"))) +
-  theme_minimal() +
-  theme(strip.text = element_text(size = 10, hjust = 0.5)) +
-  labs(title = "Percent Age Distribution by Priority Level",
-       x = "Priority Level",
-       y = "Percent Value",
-       fill = "Priority Level")
-```
-
-### Line chart for race demographics by priority level
-
-```{r}
-demo_master_data %>% 
-  mutate(priority_level = factor(priority_level, levels = c("Low", "Medium", "High"))) %>% 
-  pivot_longer(cols = c(ppac22, paa22, pwhite22, phisp22, pasi22), 
-               names_to = "race_variable", 
-               values_to = "value") %>% 
-  group_by(priority_level, race_variable) %>% 
-  summarise(mean_value = mean(value, na.rm = TRUE)) %>% 
-  ggplot(aes(x = race_variable, y = mean_value, group = priority_level, color = priority_level)) +
-  geom_line(size = 1) +
-  geom_point(size = 2) +
-  scale_color_manual(values = c("green", "yellow", "red")) +
-  scale_x_discrete(labels = c(ppac22 = "% Other",
-                              paa22 = "% African American",
-                              pwhite22 = "% White",
-                              phisp22 = "% Hispanic",
-                              pasi22 = "% Asian")) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
-        plot.title = element_text(size = 12),
-        legend.title = element_text(size = 10),
-        legend.text = element_text(size = 8)) +
-  labs(title = "Average Percentage of Race Demographics by Priority Level",
-       x = "Race Demographic",
-       y = "Average Percent Value",
-       color = "Priority Level")
-```
-
-## Column
-
-### Stacked bar chart for race demographics and age groups by priority level
-
-```{r}
-demo_master_data %>% 
-  mutate(priority_level = factor(priority_level, levels = c("Low", "Medium", "High"))) %>%
-  pivot_longer(cols = c(ppac22, paa22, pwhite22, phisp22, pasi22), 
-               names_to = "variable", 
-               values_to = "value") %>% 
-  group_by(priority_level, variable) %>%
-  summarise(mean_value = mean(value, na.rm = TRUE)) %>% 
-  ggplot(aes(x = priority_level, y = mean_value, fill = variable)) +
-  geom_bar(stat = "identity", position = "stack") +
-  scale_fill_discrete(labels = c(
-                              ppac22 = "% Other",
-                              paa22 = "% African American",
-                              pwhite22 = "% White",
-                              phisp22 = "% Hispanic",
-                              pasi22 = "% Asian")) +
-  theme_minimal() +
-  theme(plot.title = element_text(size = 12),
-        legend.title = element_text(size = 10),
-        legend.text = element_text(size = 8)) +
-  labs(title = "Stacked Bar Chart for Average Percentage of Racial Groups by Priority Level",
-       x = "Priority Level",
-       y = "Average Percent Value",
-       fill = "Demographic Category")
-```
-
-### Horizontal bar chart for education levels
-
-```{r}
-demo_master_data %>% 
-  pivot_longer(cols = c(lesshs21, hsdipl21), names_to = "education", values_to = "value") %>% 
-  group_by(priority_level, education) %>% 
-  summarise(mean_value = mean(value, na.rm = TRUE)) %>% 
-  mutate(priority_level = factor(priority_level, levels = c("Low", "Medium", "High")),
-         education = factor(education, levels = c("lesshs21", "hsdipl21"),
-                            labels = c("Less than High School", "High School Diploma"))) %>% 
-  ggplot(aes(x = mean_value, y = education, fill = priority_level)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  scale_fill_manual(values = c("green", "yellow", "red")) +
-  theme_minimal() +
-  theme(
-    axis.text.y = element_text(size = 10),
-    plot.title = element_text(size = 12),
-    legend.title = element_text(size = 10),
-    legend.text = element_text(size = 8)
-  ) +
-  labs(title = "Average Percentage of Education Levels by Priority Level",
-       x = "Average Percent Value",
-       y = "Education Level",
-       fill = "Priority Level")
-```
-
