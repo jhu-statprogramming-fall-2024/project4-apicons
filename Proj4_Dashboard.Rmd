@@ -154,14 +154,14 @@ leaflet(master_data_with_geometry) %>%
       "<strong>Healthy Food Availability Index Score:</strong> ", hfai_category, "<br>",
       "<strong>Has Grocery Store:</strong> ", ifelse(has_store == 1, "Yes", "No")
     ),
-    label = ~paste0(
-      CSA2010
-    ),
-    labelOptions = labelOptions(
-      style = list("font-weight" = "bold"), # Bold text
-      textsize = "12px",                   # Font size
-      direction = "auto"                   # Automatically adjust label placement
-    )
+  #  label = ~paste0(
+  #    CSA2010
+  #  ),
+  #  labelOptions = labelOptions(
+  #    style = list("font-weight" = "bold"), # Bold text
+  #    textsize = "12px",                   # Font size
+  #    direction = "auto"                   # Automatically adjust label placement
+  #  )
   ) %>%
   addLegend(
     position = "bottomright",
@@ -213,19 +213,20 @@ leaflet(master_data_with_geometry_2018) %>%
       "<strong>Neighborhood:</strong> ", CSA2010, "<br>",
       "<strong>Median Income:</strong> $", format(median_income, big.mark = ","), "<br>",
       "<strong>Percent Without Vehicle:</strong> ", round(percnt_no_vehicle, 1), "%<br>",
+      "<strong>Healthy Food Availability Index Score:</strong> ", hfai_category, "<br>",
       "<strong>Has Grocery Store:</strong> ", ifelse(has_store == 1, "Yes", "No")
     ),
-    label = ~paste0(
-      CSA2010, "<br>",
-      "Median Income: $", format(median_income, big.mark = ","), "<br>",
-      "No Vehicle: ", round(percnt_no_vehicle, 1), "%<br>",
-      "Grocery Store: ", ifelse(has_store == 1, "Yes", "No")
-    ),
-    labelOptions = labelOptions(
-      style = list("font-weight" = "bold"), # Bold text
-      textsize = "12px",                   # Font size
-      direction = "auto"                   # Automatically adjust label placement
-    )
+   # label = ~paste0(
+  #    CSA2010, "<br>",
+  #    "Median Income: $", format(median_income, big.mark = ","), "<br>",
+  #    "No Vehicle: ", round(percnt_no_vehicle, 1), "%<br>",
+  #    "Grocery Store: ", ifelse(has_store == 1, "Yes", "No")
+  #  ),
+  #  labelOptions = labelOptions(
+  #    style = list("font-weight" = "bold"), # Bold text
+  #    textsize = "12px",                   # Font size
+  #    direction = "auto"                   # Automatically adjust label placement
+  #  )
   ) %>%
   addLegend(
     position = "bottomright",
@@ -539,9 +540,15 @@ coords <- function(address, city, state, zip) {
   ungroup() %>% unnest_wider(new) %>% 
   filter(dist == min(dist)) 
   
+  icon.ion <- makeAwesomeIcon(icon = 'home', markerColor = 'green', library='ion')
+  
   leaflet() %>%
   addTiles() %>%
-  addMarkers(lng=new$lons_, lat=new$lats_, popup=new$name)
+  addMarkers(lng=new$lons_, lat=new$lats_, label = new$name) %>% 
+  addAwesomeMarkers(
+    lng=coordinates$long, lat=coordinates$lat,
+    label=paste(address, ", ", city, ", ", state, " ", zip, sep = ""),
+    icon = icon.ion)
 }
 ```
 
