@@ -477,6 +477,7 @@ demo_master_stat %>%
   summarise(mean_value = mean(value, na.rm = TRUE)) %>% 
   ggplot(aes(x = `Priority Level`, y = mean_value, fill = `Priority Level`)) +
   geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(values = c("green", "yellow", "red")) +
   facet_wrap(~variable, scales = "free_y") +
   theme_minimal() +
   theme(strip.text = element_text(size = 10, hjust = 0.5),
@@ -502,6 +503,7 @@ demo_master_data %>%
                values_to = "value") %>% 
   ggplot(aes(x = priority_level, y = value, fill = priority_level)) +
   geom_boxplot() +
+  scale_fill_manual(values = c("green", "yellow", "red")) +
   facet_wrap(~age_group, scales = "free_y", labeller = as_labeller(
     c(age18_22 = "% Age 5-17",
       age24_22 = "% Age 18-24",
@@ -528,6 +530,7 @@ demo_master_data %>%
   ggplot(aes(x = race_variable, y = mean_value, group = priority_level, color = priority_level)) +
   geom_line(size = 1) +
   geom_point(size = 2) +
+  scale_color_manual(values = c("green", "yellow", "red")) +
   scale_x_discrete(labels = c(ppac22 = "% Other",
                               paa22 = "% African American",
                               pwhite22 = "% White",
@@ -586,6 +589,7 @@ demo_master_data %>%
                             labels = c("Less than High School", "High School Diploma"))) %>% 
   ggplot(aes(x = mean_value, y = education, fill = priority_level)) +
   geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(values = c("green", "yellow", "red")) +
   theme_minimal() +
   theme(
     axis.text.y = element_text(size = 10),
@@ -598,3 +602,4 @@ demo_master_data %>%
        y = "Education Level",
        fill = "Priority Level")
 ```
+
