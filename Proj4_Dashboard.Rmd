@@ -33,18 +33,79 @@ library(tidygeocoder)
 library(sf)
 library(geosphere)
 library(bslib)
+library(knitr)
 ```
 
 # Welcome
 
-### Welcome 
+## column
+
+### Welcome
 
 ```{r}
 h1(strong("Welcome!"), style = "font-size:30px;")
 ```
 
+This is a project created by three Biostatistics ScM students at Johns Hopkins University. Our research questions are:
 
-This is a project created by three Biostatistics ScM students at Johns Hopkins University. We are exploring food accessibility in Baltimore by neighborhood. We will be looking at the distribution of grocery stores in Baltimore, the demographic characteristics of neighborhoods, and the accessibility of grocery stores in Baltimore. This is a resource for residents of Baltimore to find their nearest grocery store and learn more about their neighborhood, or for policymakers who are seeking a broad overview of food accessibility in Baltimore.
+**How has food accessibility across different neighborhoods in Baltimore changed since 2018?**\
+**Which groups of people have easier or harder access to healthy food in Baltimore?**
+
+In this dashboard, we explore food accessibility in Baltimore by neighborhood by looking at the distribution of grocery stores in Baltimore, the demographic characteristics of neighborhoods, and the accessibility of grocery stores in Baltimore. This is a resource for residents of Baltimore to find their nearest grocery store and learn more about their neighborhood, or for policymakers who are seeking a broad overview of food accessibility in Baltimore.
+
+```{r}
+h1(strong("Motivation"), style = "font-size:30px;")
+```
+
+The motivation for this project is to build upon [a 2018 study](https://planning.baltimorecity.gov/baltimore-food-policy-initiative/food-environment) conducted by the City of Baltimore Department of Planning and JHU Center for a Livable Future that identified neighborhoods in Baltimore City that are Healthy Food Priority Areas using more current data to see if food accessibility has changed during that time. A Healthy Food Priority Area is a neighborhood that meets the following criteria:
+
+1.  The average Healthy Food Availability Index (HFAI) score\* is in the lowest tier.\
+2.  The median household income is at or below 185% of the Federal Poverty Level\
+3.  Over 30% of households do not have a vehicle available\
+4.  The distance to a supermarket is more than ¼ mile\
+    Source: City of Baltimore Department of Planning
+
+\*The average HFAI score is a composite score that measures the availability of healthy food in a neighborhood. Each store (convenience store, supermarket, corner store etc.) is assigned a score based on its availability of healthy food options such as fresh produce and whole grains. The stores in each neighborhood are then averaged to get the neighborhood's HFAI score.
+
+This is an important topic to study because food accessibility is a key determinant of health. In 2018, about 25% of Baltimoreans lived in a Healthy Food Priority Area, which demonstrates that this is a critical issue to public health in Baltimore ([Misiaszek et al, 2018)](https://clf.jhsph.edu/publications/baltimore-citys-food-environment-report-2018-report). Additionally, the pandemic brought economic hardship which may have worsened food accessibility. Identifying which areas are at highest priority for improving access can inform city leaders to create a healthier Baltimore
+
+```{r}
+h1(strong("Data Source"), style = "font-size:30px;")
+```
+
+We used data from the [Open Baltimore API](https://data.baltimorecity.gov/) to calculate the scores for each neighborhood. The neighborhood boundaries we used are called Community Statistical Areas (CSAs) and differ from zip code boundaries.
+
+## column
+
+### Dashboard Contents
+
+```{r}
+h1(strong("Dashboard Contents"), style = "font-size:24px;")
+```
+
+```{r}
+h1(strong("Categorization of Baltimore Neighborhoods"), style = "font-size:15px;")
+```
+
+This page displays maps of Baltimore that indicate the priority level of each neighborhood, both today and in 2018. The maps also include information on food accessibility for each neighborhood.
+
+```{r}
+h1(strong("Find Your Nearest Grocery Store"), style = "font-size:15px;")
+```
+
+Visit this page to input your address and find the nearest grocery store. You can also find a map of all Baltimore grocery stores for your reference on this page.
+
+```{r}
+h1(strong("Demographic Characteristics of Baltimore Neighborhoods"), style = "font-size:15px;")
+```
+
+Visit this page to learn about the demographic characteristics of Baltimore neighborhoods and how they relate to food accessibility.
+
+### Pictured below: Safeway in Canton
+
+```{r picture, echo = F, out.width = '50%'}
+knitr::include_graphics("safeway.jpg")
+```
 
 # Categorization of Baltimore Neighborhoods
 
@@ -112,8 +173,8 @@ leaflet(master_data_with_geometry) %>%
   )
 ```
 
-
 ## 2018 Map with priority levels
+
 ```{r}
 #Getting neighbourhood boundary geometries
 csa_name_geometry <- mapbaltimore::csas %>%
@@ -177,6 +238,7 @@ leaflet(master_data_with_geometry_2018) %>%
 ```
 
 ### Seeing which neighbourhoods changed category
+
 ```{r}
 comparison_data <- master_data %>%
   inner_join(master_data_2018, by = "CSA2010", suffix = c("_master", "_master_2018"))
@@ -189,6 +251,7 @@ changed_priority <- comparison_data %>%
 # View the CSA2010 values where priority_level differs
 print(changed_priority)
 ```
+
 # Find Your Nearest Grocery Store
 
 ### Address Lookup
@@ -298,7 +361,8 @@ server <- function(input, output) {
 shinyApp(ui, server)
 ```
 
-### Map of Baltimore grocery stores
+### Map of All Baltimore Grocery Stores
+
 ```{r}
 # Create the leaflet map
 leaflet(master_data_with_geometry) %>%
@@ -325,4 +389,5 @@ leaflet(master_data_with_geometry) %>%
       "<strong>Address:</strong> ", address)
   )
 ```
+
 # Demographic Characteristics of Baltimore Neighborhoods
