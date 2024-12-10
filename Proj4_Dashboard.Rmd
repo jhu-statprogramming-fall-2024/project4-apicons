@@ -390,9 +390,7 @@ leaflet(master_data_with_geometry) %>%
   )
 ```
 
-# Demographic Characteristics of Baltimore Neighborhoods
-
-Demographic Summary Statistics
+# Demographic Summary Statistics
 
 ## Column
 
@@ -444,7 +442,7 @@ demo_master_stat %>%
        y = " Mean Percent Value")
 ```
 
-Demographic Data Visualization
+# Demographic Data Visualization
 
 ## Column
 
