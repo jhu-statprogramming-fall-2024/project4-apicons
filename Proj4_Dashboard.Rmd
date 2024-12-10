@@ -3,11 +3,11 @@ title: "Food Accessibility in Baltimore by Neighborhood"
 author: "Amia Graye, Rosie Quint, and Julia Martin"
 output: 
   flexdashboard::flex_dashboard: 
-    social: menu
     source_code: embed
     vertical_layout: scroll
     orientation: columns
-    style: css
+    theme: 
+      version: 4
 runtime: shiny
 ---
 
@@ -391,12 +391,12 @@ leaflet(master_data_with_geometry) %>%
       "<strong>Address:</strong> ", address)
   )
 ```
-<<<<<<< HEAD
+
 
 # Demographic Characteristics of Baltimore Neighborhoods
-=======
+
 Demographic Summary Statistics 
-===================================
+
 
 Column 
 ----------------------------------
