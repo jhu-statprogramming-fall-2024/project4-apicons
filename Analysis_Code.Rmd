@@ -184,7 +184,53 @@ write_csv(master_neighbourhood_data, "master_neighbourhood_data.csv")
 ```
 
 
-# Joining master neighbourhood data with multipolygon coordinate data from mapbaltimore package 
+# 2018 category levels
+
+
+Percent of Vehicles Available
+
+```{r}
+jsonData <- read_json(vehicles_url, simplifyVector = TRUE)
+
+vehicles <- jsonData$features$attributes %>%
+select(OBJECTID, CSA2010, novhcl18, Shape__Area, Shape__Length)
+
+vehicle_table_for_joining <- vehicles %>%
+  mutate(vehicle_boolean = ifelse(novhcl18 > 30, 1, 0)) %>%
+  select(CSA2010, vehicle_boolean, percnt_no_vehicle = novhcl18)
+head(vehicle_table_for_joining)
+
+```
+```{r}
+jsonData <- read_json(income_url, simplifyVector = TRUE)
+
+med_income <- jsonData$features$properties %>% 
+  select(OBJECTID, CSA2010, mhhi18, Shape__Area, Shape__Length)
+
+income_table_for_joining <- med_income %>%
+  mutate(income_boolean = ifelse(mhhi18 < 46435, 1, 0)) %>%
+  select(CSA2010, income_boolean, median_income = mhhi18)
+```
+```{r}
+master_neighbourhood_data_2018 <- income_table_for_joining %>%
+  left_join(vehicle_table_for_joining, by = 'CSA2010') %>%
+  left_join(grocery_store_join, by = 'CSA2010') %>%
+  left_join(hfai_for_joining, by = 'CSA2010') %>%
+  mutate(
+    number_criteria_met = income_boolean + vehicle_boolean + has_store + hfai_boolean,
+    priority_level = case_when(
+      number_criteria_met == 4 ~ 'High',
+      number_criteria_met > 2 ~ 'Medium',
+      number_criteria_met < 3 ~ 'Low'
+    )
+  )
+master_neighbourhood_data_2018
+```
+
+```{r}
+write_csv(master_neighbourhood_data_2018, "master_neighbourhood_data_2018.csv")
+```
+
 
 # Loading demographic data from API
 
