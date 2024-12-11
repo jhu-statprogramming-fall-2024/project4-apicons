@@ -110,12 +110,12 @@ knitr::include_graphics("safeway.jpg")
 
 # Categorization of Baltimore Neighborhoods
 
-Row {.tabset .tabset-fade}
------------------------------------------------------------------------
+This page displays maps of Baltimore showing the healthy food priority level of each neighborhood, both today and in 2018. It highlights neighborhoods that changed categories of healthy food priority between 2018 and 2022, and includes information on the specfic changes that occurred for neighbourhoods which changed priority level. This resource can be used both for people seeking to understand which priority level their own neighbourhood is at, as well as those seeking to see where the COVID-19 pandemic may have had its greatest impacts.
 
-```{r}
-h1(strong("Map of Baltimore Neighborhoods with 2022 Healthy Food Priority Levels"), style = "font-size:25px;")
-```
+## Map of Baltimore Neighborhoods with 2018 or 2022 Healthy Food Priority Levels
+Row{.tabset .tabset-fade}
+-----------------------------------------------------------------------
+#### 2022
 
 ```{r}
 #Getting neighbourhood boundary geometries
@@ -177,9 +177,7 @@ leaflet(master_data_with_geometry) %>%
   )
 ```
 
-```{r}
-h1(strong("Map of Baltimore Neighborhoods with 2018 Healthy Food Priority Levels"), style = "font-size:25px;")
-```
+#### 2018
 
 ```{r}
 #Getting neighbourhood boundary geometries
@@ -246,14 +244,9 @@ leaflet(master_data_with_geometry_2018) %>%
 
 Row
 -----------------------------------------------------------------------
+## Exploring the Neighborhoods Which Experienced a Change in Healthy Food Priority Level
 
-```{r}
-h1(strong("Exploring the Neighborhoods Which Experienced a Change in Healthy Food Priority Level"), style = "font-size:25px;")
-```
-
-```{r}
-h2(strong("Map of Baltimore Neighborhoods Which Changed Priority Level Between 2018 and 2022"), style = "font-size:25px;")
-```
+#### Map of Baltimore Neighborhoods Which Changed Priority Level Between 2018 and 2022
 
 ```{r}
 
@@ -310,9 +303,7 @@ title = "Changed category between 2018 and 2022"
 )
 ```
 
-```{r}
-h2(strong("Dumbbell plot of Baltimore neighborhood names which changed priority level between 2018 and 2022"), style = "font-size:30px;")
-```
+#### Dumbbell plot of Baltimore neighborhood names which changed priority level between 2018 and 2022
 
 ```{r}
 # Retain wide format for geom_segment
