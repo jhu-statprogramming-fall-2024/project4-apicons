@@ -112,8 +112,9 @@ knitr::include_graphics("safeway.jpg")
 
 Row {.tabset .tabset-fade}
 -----------------------------------------------------------------------
+
 ```{r}
-h1(strong("Map of Baltimore neighborhoods with 2022 Healthy Food Priority Levels"), style = "font-size:30px;")
+h1(strong("Map of Baltimore Neighborhoods with 2022 Healthy Food Priority Levels"), style = "font-size:25px;")
 ```
 
 ```{r}
@@ -177,7 +178,7 @@ leaflet(master_data_with_geometry) %>%
 ```
 
 ```{r}
-h1(strong("Map of Baltimore neighborhoods with 2018 Healthy Food Priority Levels"), style = "font-size:30px;")
+h1(strong("Map of Baltimore Neighborhoods with 2018 Healthy Food Priority Levels"), style = "font-size:25px;")
 ```
 
 ```{r}
@@ -245,12 +246,13 @@ leaflet(master_data_with_geometry_2018) %>%
 
 Row
 -----------------------------------------------------------------------
+
 ```{r}
-h1(strong("Exploring the neighborhoods which experienced a change in Healthy Food Priority Level"), style = "font-size:30px;")
+h1(strong("Exploring the Neighborhoods Which Experienced a Change in Healthy Food Priority Level"), style = "font-size:25px;")
 ```
 
 ```{r}
-h2(strong("Map of Baltimore neighborhoods which changed priority level between 2018 and 2022"), style = "font-size:30px;")
+h2(strong("Map of Baltimore Neighborhoods Which Changed Priority Level Between 2018 and 2022"), style = "font-size:25px;")
 ```
 
 ```{r}
@@ -527,11 +529,6 @@ demo_master_data %>%
 
 ### Address Lookup
 
-<<<<<<< HEAD
-=======
-#define address lookup function
-
->>>>>>> 3795a13 (Small fixes)
 ```{r}
 grocery_store_url <- "https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Grocery_Store/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
 
