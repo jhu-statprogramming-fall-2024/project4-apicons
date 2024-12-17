@@ -4,36 +4,32 @@ output: html_document
 date: "2024-11-20"
 ---
 
-To Do:
-
-Extract data from API 
-Categorize the neighborhoods by the criteria
-
-Julia: grocery store distance
-Amia: vehicles
-Rosie: income
-
-### Extract Data from API:  
+### Extract Data from API for each of the 4 datasets for criteria using Bash:  
 
 HFAI  
 
+```{bash}
+curl -H "Accept: application/json" -X GET "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hfai/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json" -o hfai.json
+```
+
+
 ```{r}
+library(dplyr)
 library(jsonlite)
 library(tidyverse)
-
-hfai_url <- "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hfai/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
-
-jsonData <- read_json(hfai_url, simplifyVector = TRUE)
-
-hfai <- jsonData$features$attributes %>% 
+library(purrr)
+hfai_json <- read_json("hfai.json", simplifyVector = TRUE) 
+hfai <- hfai_json$features$attributes %>% 
   select(OBJECTID, CSA2010, hfai15, Shape__Area, Shape__Length)
-head(hfai)
 
+head(hfai)
 
 # LOW TIER IS 0-9.5
 # MEDIUM TIER IS 9.6-19
 # HIGH TIER IS 19.1 - 28.5
 ```
+Adjust Data for Joining
+
 ```{r}
 hfai_for_joining <- hfai %>% 
   select(CSA2010, hfai15) %>% 
@@ -47,18 +43,20 @@ hfai_for_joining
 
 
 Median Income
+
 Notes - use threshold of federal poverty level for a family of 4 ($31,200 in 2024). classify neighbourhoods as 1 where median income is 185% of this or less (in this case $57,720)
 
+```{bash}
+curl -H "Accept: application/json" -X GET "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Mhhi/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson" -o income.json
+```
+
+
 ```{r}
-library(jsonlite)
-library(tidyverse)
-
-income_url <- "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Mhhi/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson"
-
-jsonData <- read_json(income_url, simplifyVector = TRUE)
-
-med_income <- jsonData$features$properties %>% 
+income_json <- read_json("income.json", simplifyVector = TRUE) 
+med_income <- income_json$features$properties %>% 
   select(OBJECTID, CSA2010, mhhi22, Shape__Area, Shape__Length)
+
+head(med_income)
 
 income_table_for_joining <- med_income %>%
   mutate(income_boolean = ifelse(mhhi22 < 57720, 1, 0)) %>%
@@ -67,40 +65,38 @@ income_table_for_joining <- med_income %>%
 
 Percent of Vehicles Available
 
+```{bash}
+curl -H "Accept: application/json" -X GET "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Novhcl/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json" -o vehicles.json
+```
+
 ```{r}
-library(jsonlite)
-library(tidyverse)
-
-vehicles_url <- "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Novhcl/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
-
-jsonData <- read_json(vehicles_url, simplifyVector = TRUE)
-
-vehicles <- jsonData$features$attributes %>%
-select(OBJECTID, CSA2010, novhcl22, Shape__Area, Shape__Length)
+vehicles_json <- read_json("vehicles.json", simplifyVector = TRUE) 
+vehicles <- vehicles_json$features$attributes %>% 
+  select(OBJECTID, CSA2010, novhcl22, Shape__Area, Shape__Length)
 
 vehicle_table_for_joining <- vehicles %>%
   mutate(vehicle_boolean = ifelse(novhcl22 > 30, 1, 0)) %>%
   select(CSA2010, vehicle_boolean, percnt_no_vehicle = novhcl22)
 head(vehicle_table_for_joining)
-
 ```
 
 Grocery Store Location
 
 ```{r}
-library(jsonlite)
-library(tidyverse)
-
 # install.packages("pak")
 library(pak)
 library(purrr)
 pak::pkg_install("elipousson/mapbaltimore", dependencies = TRUE)
 library(mapbaltimore)
-grocery_store_url <- "https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Grocery_Store/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
+```
 
-jsonData <- read_json(grocery_store_url, simplifyVector = TRUE)
+```{bash}
+curl -H "Accept: application/json" -X GET "https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Grocery_Store/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json" -o grocery.json
+```
 
-grocery_stores <- jsonData$features$attributes
+```{r}
+grocery_json <- read_json("grocery.json", simplifyVector = TRUE) 
+grocery_stores <- grocery_json$features$attributes 
 
 # remove store in row 46 because it is outside of the zone and doesn't register as an address
 
