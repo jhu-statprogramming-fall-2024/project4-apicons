@@ -1,0 +1,47 @@
+---
+title: "Project 4 Write-Up"
+format: html
+editor: visual
+---
+
+# Introduction
+
+# Research Questions
+
+# Background and Motivation
+
+# Data Source
+
+# Methods
+
+# Programming Paradigms
+
+# Results
+
+# Analysis
+
+# Dashboard
+
+# Limitations
+
+# Future Work
+
+# References
+
+Write up a summary of your final project and submit it to GitHub classroom.
+
+Please explain the importance of the project, give an overview of the technical challenges, and what you learned. Also consider the following:
+
+Write up quality: Is the write up clear on what was the question being investigated? What were the orginal goals and what was accomplished along the way? Was there previous work in this area? Do the figures have large enough legends and figure titles? Did you describe the data?
+
+Is there a README.md in the repo you push to GitHub classroom summarizing key details about the project, including team members and an overview of the final project?
+
+Have you linked to all code and data needed to reproduce your work?
+
+Paradigm integration: How effectively does your project demonstrate multiple paradigms?
+
+Functionality: Does the data analytic product work as intended? Are the components well-integrated?
+
+Usability and documentation: Is the data analytic product easy to use/read and well-documented?
+
+Originality and complexity: Does the project address a non-trivial statistical or programming problem with creativity?
