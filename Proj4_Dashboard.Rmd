@@ -1,15 +1,17 @@
 ---
 title: "Food Accessibility in Baltimore by Neighborhood"
 author: "Amia Graye, Rosie Quint, and Julia Martin"
-output: 
-  flexdashboard::flex_dashboard: 
+output:
+  flexdashboard::flex_dashboard:
     source_code: embed
     vertical_layout: scroll
     orientation: columns
-    theme: 
+    theme:
       version: 4
-    style: css  
+    style: css
 runtime: shiny
+resource_files:
+- Analysis_Code.Rmd
 ---
 
 ```{r global, include=FALSE}

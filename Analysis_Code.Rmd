@@ -94,7 +94,7 @@ library(tidyverse)
 # install.packages("pak")
 library(pak)
 library(purrr)
-#pak::pkg_install("elipousson/mapbaltimore", dependencies = TRUE)
+pak::pkg_install("elipousson/mapbaltimore", dependencies = TRUE)
 library(mapbaltimore)
 grocery_store_url <- "https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Grocery_Store/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
 
