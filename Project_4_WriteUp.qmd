@@ -40,11 +40,23 @@ We used data from the Open Baltimore API, which is a free resource that provides
 
 # Methods and Programming Paradigms
 
-1.  Extract data from Open Baltimore API using shell scripting executed in R. Here is an example of extracting a dataset from the API on HFAI scores from a JSON url.
+1.  We extracted data from Open Baltimore API using shell scripting executed in R. Here is an example of extracting a dataset from the API on HFAI scores from a JSON url.
 
 ```{bash}
 curl -H "Accept: application/json" -X GET "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hfai/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json" -o hfai.json
 ```
+
+2.  We cleaned the data and manipulated each of the 4 datasets containing information on the Healthy Food Priority Area criteria so that we could join them together to categorize them into priority levels. We employed functional programming in this step. Here is an example of using a map() function to generate a list of neighborhoods in Baltimore that contain a supermarket. We also used the mapbaltimore package which can take an address as an input and output the neighborhood or CSA in which that address is located.
+
+```{r, eval = F}
+csas_with_store <- map(.x = add, .f = ~ get_area(type="csa", location = .x)$name)
+```
+
+3.  We constructed heatmaps that display the Healthy Food Priority for each neighborhood in Baltimore, both using the 2018 data and 2022 data.
+
+4.  We conducted descriptive analysis on the demographic characteristics of each neighborhood and their corresponding Healthy Food Priority Levels.
+
+5.  We compiled our maps and figures onto our dashboard and added interactive features for users to explore the food accessibility of different neighborhoods or the food accessibility patterns in neighborhoods with certain demographic features. We also added a widget for users to type in an address and find the nearest grocery store.
 
 # Analysis
 
@@ -54,9 +66,17 @@ curl -H "Accept: application/json" -X GET "https://services1.arcgis.com/mVFRs7NF
 
 # Technical Challenges
 
+We ran into some challenges with extracting the data from the JSON files initially.
+
 # Limitations
 
+Our main limitation in this work is the data availability. We did not have access to recent HFAI data and grocery store locations, so we had to use data from 2018, so our results may differ if we were to use updated data for those categories. Additionally, the Community Statistical Area boundaries are large and there could be heterogeneity within neighborhoods that our analysis did not pick up on, so having more granular data could provide a more detailed analysis. Lastly, some of the criteria for Healthy Food Prioirty Areas, such as distance to a grocery store, have been debunked as poor forms of measuring food access based on [new studies](https://pmc.ncbi.nlm.nih.gov/articles/PMC5998793/#:~:text=Logistic%20regression%20analysis%20was%20used,not%20associated%20with%20food%20security.).
+
 # Future Work
+
+In the future, we would continue this work by recalculating updated HFAI scores for each neighborhood or devise another metric that is less resource intensive, as the data collection process to calculate this score involves a detailed questionnaire that must be taken into every single store in an area. This would also allow us to be able to repeat this analysis in other areas and other cities across the United States.
+
+We would also attempt to acquire more granular data and rerun our analysis to understand more specifically which areas of Baltimore are lacking access to healthy food.
 
 # References
 
@@ -64,7 +84,7 @@ Write up a summary of your final project and submit it to GitHub classroom.
 
 Please explain the importance of the project, give an overview of the technical challenges, and what you learned. Also consider the following:
 
-Write up quality: Is the write up clear on what was the question being investigated? What were the orginal goals and what was accomplished along the way? Was there previous work in this area? Do the figures have large enough legends and figure titles? Did you describe the data?
+Write up quality: Is the write up clear on what was the question being investigated? What were the original goals and what was accomplished along the way? Was there previous work in this area? Do the figures have large enough legends and figure titles? Did you describe the data?
 
 Is there a README.md in the repo you push to GitHub classroom summarizing key details about the project, including team members and an overview of the final project?
 
