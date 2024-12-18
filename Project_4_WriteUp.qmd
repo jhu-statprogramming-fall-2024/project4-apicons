@@ -1,26 +1,58 @@
 ---
-title: "Project 4 Write-Up"
+title: "Project 4 Write-Up: Team APIcons"
+subtitle: "Food Accessibility Comparison in Baltimore Before and After the COVID-19 Pandemic"
+authors: "Amia Graye, Julia Martin, Rosie Quint"
+date: "December 19, 2024"
 format: html
 editor: visual
+engine: knitr
 ---
 
 # Introduction
 
-# Research Questions
+The goal of our project is to compare food accessibility in Baltimore before and after the COVID-19 Pandemic and to understand patterns of food accessibility across Baltimore. We compiled our analysis into a Shiny Dashboard, [found here](https://jhu-statistical-computing-paradigms-project-4.shinyapps.io/Food_Accessibility_in_Baltimore_by_Neighborhood/?_gl=1*nd2m9u*_up*MQ..*_ga*MTcxODY0OTE0Ni4xNzM0NDkyODA3*_ga_HXP006LBGY*MTczNDQ5MjgwNi4xLjAuMTczNDQ5MjgwNi4wLjAuMA..*_ga_2C0WZ1JHG0*MTczNDQ5MjgwNi4xLjAuMTczNDQ5MjgwNi4wLjAuMA..), in which users can explore food accessibility in Baltimore by neighborhood by comparing each one's food accessibility rating, demographic characteristics, and the accessibility of grocery stores in Baltimore. This is a resource for residents of Baltimore to find their nearest grocery store and learn more about their neighborhood, or for policymakers who are seeking a broad overview of food accessibility in Baltimore to inform change. By employing the use of programming paradigms and R tools and packages we learned in class, we were successfully able to build on previous research in this area.
 
 # Background and Motivation
 
+The motivation for this project is to build upon [a 2018 study](https://planning.baltimorecity.gov/baltimore-food-policy-initiative/food-environment) conducted by the City of Baltimore Department of Planning and JHU Center for a Livable Future that identified neighborhoods in Baltimore City that are Healthy Food Priority Areas. However, our aim was to use more current data from 2022 to see if food accessibility has changed since that time, which also marks the period of before and after the pandemic. A Healthy Food Priority Area is a neighborhood that meets the following criteria:
+
+1.  The average Healthy Food Availability Index (HFAI) score\* is in the lowest tier.
+
+2.  The median household income is at or below 185% of the Federal Poverty Level
+
+3.  Over 30% of households do not have a vehicle available
+
+4.  The distance to a supermarket is more than ¼ mile\
+    Source: City of Baltimore Department of Planning
+
+\*The average HFAI score is a composite score that measures the availability of healthy food in a neighborhood. Each store (convenience store, supermarket, corner store etc.) is assigned a score based on its availability of healthy food options such as fresh produce and whole grains. The stores in each neighborhood are then averaged to get the neighborhood’s HFAI score.
+
+This is an important topic to study because food accessibility is a key determinant of health. In 2018, about 25% of Baltimoreans lived in a Healthy Food Priority Area, which demonstrates that this is a critical issue to public health in Baltimore ([Misiaszek et al, 2018)](https://clf.jhsph.edu/publications/baltimore-citys-food-environment-report-2018-report). Additionally, the pandemic brought economic hardship which may have worsened food accessibility, and we were curious to study potential impacts that the pandemic had on accessing foods. Lastly, identifying which areas are at highest priority for improving access can inform city leaders to create a healthier Baltimore.
+
+# Research Questions
+
+1.  **How has food accessibility across different neighborhoods in Baltimore changed since 2018?**
+2.  **Which groups of people have easier or harder access to healthy food in Baltimore?**
+
 # Data Source
 
-# Methods
+We used data from the Open Baltimore API, which is a free resource that provides data at the Community Statistical Area (CSA) level in Baltimore. We will refer to the CSAs as neighborhoods throughout the report and the boundaries can be found by looking at any of the maps on our dashboard. We extracted data on HFAI scores, percent of households without a vehicle, median household income, and grocery store location for each neighborhood which corresponds to the criteria necessary to classify a neighborhood as a Healthy Food Priority Area. We also extracted data on distribution of age, race, and education level for each neighborhood.
 
-# Programming Paradigms
+# Methods and Programming Paradigms
 
-# Results
+1.  Extract data from Open Baltimore API using shell scripting executed in R. Here is an example of extracting a dataset from the API on HFAI scores from a JSON url.
+
+```{bash}
+curl -H "Accept: application/json" -X GET "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hfai/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json" -o hfai.json
+```
 
 # Analysis
 
+# Results
+
 # Dashboard
+
+# Technical Challenges
 
 # Limitations
 
