@@ -1,9 +1,9 @@
 # Food Accessibility Comparison in Baltimore Before and After the COVID-19 Pandemic
 
 **Team Name:** APIcons  
-**Team Members:** Amia Graye, Julia Martin, Rosie Quint
-**Emails:** agraye1@jhu.edu, jmart305@jh.edu, rquint1@jh.edu
-**JHED IDs:** agraye1, jmart305, rquint1
+**Team Members:** Amia Graye, Julia Martin, Rosie Quint  
+**Emails:** agraye1@jhu.edu, jmart305@jh.edu, rquint1@jh.edu   
+**JHED IDs:** agraye1, jmart305, rquint1   
 
 ## Project Overview
 This project investigates changes in food accessibility across different neighborhoods in Baltimore before and after the COVID-19 pandemic. The goal is to create an interactive dashboard to classify neighborhoods as Healthy Food Priority Areas (HFPAs) based on data from the Open Baltimore API. Using this dashboard, users can explore food accessibility and demographic factors in relation to the COVID-19 pandemic and other socioeconomic variables.
