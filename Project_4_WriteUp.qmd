@@ -74,6 +74,8 @@ What we found very interesting in the racial demographic analysis was the distri
 
 Among the education groups, the group with the highest mean and median in high priority areas is the group with a high school diploma or GED. The highest mean and median in medium priority areas is the group with a high school diploma or GED, and the highest mean and median in the low priority areas is also the group with a high school diploma or GED. People with a high school diploma or GED make a majority of the education population, so again, this group dominates in every priority level. Both education levels, less than a high school diploma and a high school diploma or GED, have an upward trend in the mean percentage values, going from low priority levels to high priority levels. It would have been really interesting to have the percent of population with a bachelor's degree or higher in the data, as this would have shown a more complete picture of the education distribution in Baltimore.
 
+For the demographic groups, all of them have one category that is the largest in all priority levels, so it's difficult to conclude which groups of people have harder or easier access to health food in Baltimore. Based on population distribution alone, the White population are disproportionately higher in the high priority level compared to the African American population.
+
 # Dashboard
 
 # Technical Challenges
